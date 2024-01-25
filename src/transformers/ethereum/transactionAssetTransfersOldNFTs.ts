@@ -5,7 +5,7 @@ import {
   OLD_NFT_ADDRESSES,
   ERC721_TRANSFER_EVENT_1,
   ERC721_TRANSFER_EVENT_2,
-} from '../helpers/constants';
+} from '../../helpers/constants';
 import { decodeEvent } from '../helpers/sigMapper';
 
 const TRANSFER_SIGNATURES = {

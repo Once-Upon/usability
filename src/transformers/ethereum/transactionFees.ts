@@ -1,6 +1,6 @@
 import type { RawBlock, RawTransaction } from '../types';
 import { toBigNumber } from '../helpers/utils';
-import { FORKS } from '../helpers/constants';
+import { FORKS } from '../../helpers/constants';
 
 export function transform(block: RawBlock) {
   const newTxs: Partial<RawTransaction>[] = [];

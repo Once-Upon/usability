@@ -4,7 +4,7 @@ import {
   PROP_HOUSE_PROXY_CONTRACT,
   PROP_HOUSE_DAO_DEPLOYED_EVENT_HASH,
   PROP_HOUSE_DAO_DEPLOYED_EVENT,
-} from '../helpers/constants';
+} from '../../helpers/constants';
 
 export function transform(block: RawBlock): TransactionContract[] {
   const result: TransactionContract[] = block.transactions

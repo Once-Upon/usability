@@ -10,7 +10,7 @@ import {
   UNISWAP_V1_NEW_EXCHANGE_EVENT_HASH,
   UNISWAP_V2_PAIR_CREATED_EVENT_HASH,
   UNISWAP_V3_POOL_CREATED_EVENT_HASH,
-} from '../helpers/constants';
+} from '../../helpers/constants';
 
 export function transform(block: RawBlock): TransactionContract[] {
   const result: TransactionContract[] = block.transactions

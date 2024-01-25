@@ -3,7 +3,7 @@ import Web3 from 'web3';
 
 import { decodeEVMAddress, toBigNumber } from '../helpers/utils';
 import type { AssetTransfer, RawBlock, RawTransaction } from '../types';
-import { KNOWN_ADDRESSES } from '../helpers/constants';
+import { KNOWN_ADDRESSES } from '../../helpers/constants';
 
 // 1. pull out token transfers from logs
 // 2. pull out ETH transfers from traces (this covers tx.value transfers)

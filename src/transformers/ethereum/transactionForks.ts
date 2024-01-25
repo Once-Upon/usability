@@ -1,5 +1,5 @@
 import type { RawBlock } from '../types';
-import { FORKS } from '../helpers/constants';
+import { FORKS } from '../../helpers/constants';
 
 export function transform(block: RawBlock) {
   let fork: string;

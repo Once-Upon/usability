@@ -1,5 +1,5 @@
 import type { RawBlock, RawTransaction } from '../types';
-import { TRANSPARENT_UPGRADEABLE_PROXY_EVENTS } from '../helpers/constants';
+import { TRANSPARENT_UPGRADEABLE_PROXY_EVENTS } from '../../helpers/constants';
 import { decodeEVMAddress } from '../helpers/utils';
 
 type ProxyUpgrade = { hash: string; address: string; upgradedAddress: string };

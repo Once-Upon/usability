@@ -109,7 +109,9 @@ export const ERC1155_METHOD_SIGNATURES = [
   'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)',
 ];
 
-export const ERC1155_METHODS = createSignatureMapping(ERC1155_METHOD_SIGNATURES);
+export const ERC1155_METHODS = createSignatureMapping(
+  ERC1155_METHOD_SIGNATURES,
+);
 
 //https://eips.ethereum.org/EIPS/eip-165
 export const ERC165_METHOD_SIGNATURES = ['supportsInterface(bytes4)'];
@@ -118,8 +120,11 @@ export const ERC165_METHODS = createSignatureMapping(ERC165_METHOD_SIGNATURES);
 
 // Contract Addresses
 export const OPENSEA_REGISTRY_SIGNATURES = ['registerProxy()'];
-export const OPENSEA_REGISTRY_METHODS = createSignatureMapping(OPENSEA_REGISTRY_SIGNATURES);
-export const OPENSEA_REGISTRY_ADDRESS = '0xa5409ec958c83c3f309868babaca7c86dcb077c1';
+export const OPENSEA_REGISTRY_METHODS = createSignatureMapping(
+  OPENSEA_REGISTRY_SIGNATURES,
+);
+export const OPENSEA_REGISTRY_ADDRESS =
+  '0xa5409ec958c83c3f309868babaca7c86dcb077c1';
 
 // Gnosis Safe
 export const GNOSIS_SAFE_FACTORY_METHOD_SIGNATURES = [
@@ -128,13 +133,20 @@ export const GNOSIS_SAFE_FACTORY_METHOD_SIGNATURES = [
   'createProxyWithCallback(address,bytes,uint256,address)',
 ];
 
-export const GNOSIS_SAFE_FACTORY_METHODS = createSignatureMapping(GNOSIS_SAFE_FACTORY_METHOD_SIGNATURES);
+export const GNOSIS_SAFE_FACTORY_METHODS = createSignatureMapping(
+  GNOSIS_SAFE_FACTORY_METHOD_SIGNATURES,
+);
 
-export const GNOSIS_SAFE_FACTORY_0_1_0_ADDRESS = '0x88cd603a5dc47857d02865bbc7941b588c533263'; // Not used often
-export const GNOSIS_SAFE_FACTORY_1_0_0_ADDRESS = '0x12302fe9c02ff50939baaaaf415fc226c078613c'; // This release appears to have been buggy and didn't deploy contracts often
-export const GNOSIS_SAFE_FACTORY_1_0_1_ADDRESS = '0x50e55af101c777ba7a1d560a774a82ef002ced9f'; // Not used often
-export const GNOSIS_SAFE_FACTORY_1_1_1_ADDRESS = '0x76e2cfc1f5fa8f6a5b3fc4c8f4788f0116861f9b';
-export const GNOSIS_SAFE_FACTORY_1_3_0_ADDRESS = '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2';
+export const GNOSIS_SAFE_FACTORY_0_1_0_ADDRESS =
+  '0x88cd603a5dc47857d02865bbc7941b588c533263'; // Not used often
+export const GNOSIS_SAFE_FACTORY_1_0_0_ADDRESS =
+  '0x12302fe9c02ff50939baaaaf415fc226c078613c'; // This release appears to have been buggy and didn't deploy contracts often
+export const GNOSIS_SAFE_FACTORY_1_0_1_ADDRESS =
+  '0x50e55af101c777ba7a1d560a774a82ef002ced9f'; // Not used often
+export const GNOSIS_SAFE_FACTORY_1_1_1_ADDRESS =
+  '0x76e2cfc1f5fa8f6a5b3fc4c8f4788f0116861f9b';
+export const GNOSIS_SAFE_FACTORY_1_3_0_ADDRESS =
+  '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2';
 
 export const KNOWN_ADDRESSES = {
   CryptoKitties: '0x06012c8cf97bead5deae237070f9587f8e7a266d', // Meow
@@ -155,10 +167,12 @@ const createEventSignatureMapping = (signatures: string[]) => {
 };
 
 // https://eips.ethereum.org/EIPS/eip-1967
-export const TRANSPARENT_UPGRADEABLE_PROXY_EVENT_SIGNATURES = ['Upgraded(address)'];
+export const TRANSPARENT_UPGRADEABLE_PROXY_EVENT_SIGNATURES = [
+  'Upgraded(address)',
+];
 
 export const TRANSPARENT_UPGRADEABLE_PROXY_EVENTS = createEventSignatureMapping(
-  TRANSPARENT_UPGRADEABLE_PROXY_EVENT_SIGNATURES
+  TRANSPARENT_UPGRADEABLE_PROXY_EVENT_SIGNATURES,
 );
 
 export const ERC20ABI: AbiItem[] = [
@@ -251,26 +265,38 @@ export const INTERFACE_IDS = {
   ERC777TokensRecipient: '0x9a20483d',
 };
 
-export const GENERIC_GOVERNANCE_INTERFACES = ['0xbf26d897', '0x79dd796f', '0x3938f78a'];
+export const GENERIC_GOVERNANCE_INTERFACES = [
+  '0xbf26d897',
+  '0x79dd796f',
+  '0x3938f78a',
+];
 
 export const UNISWAP_V3_FACTORY = '0x1f98431c8ad98523631ae4a59f267346ea31f984';
 export const UNISWAP_V2_FACTORY = '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f';
 export const UNISWAP_V1_FACTORY = '0xc0a47dfe034b400b47bdad5fecda2621de6c4d95';
-export const PROP_HOUSE_PROXY_CONTRACT = '0xd310a3041dfcf14def5ccbc508668974b5da7174';
-export const PROP_HOUSE_IMPLEMENTATION_CONTRACT = '0x138d8aef5cbbbb9ea8da98cc0847fe0f3b573b40';
+export const PROP_HOUSE_PROXY_CONTRACT =
+  '0xd310a3041dfcf14def5ccbc508668974b5da7174';
+export const PROP_HOUSE_IMPLEMENTATION_CONTRACT =
+  '0x138d8aef5cbbbb9ea8da98cc0847fe0f3b573b40';
 
-export const UNISWAP_V3_POOL_CREATED_EVENT_HASH = '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118';
-export const UNISWAP_V2_PAIR_CREATED_EVENT_HASH = '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9';
-export const UNISWAP_V1_NEW_EXCHANGE_EVENT_HASH = '0x9d42cb017eb05bd8944ab536a8b35bc68085931dd5f4356489801453923953f9';
+export const UNISWAP_V3_POOL_CREATED_EVENT_HASH =
+  '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118';
+export const UNISWAP_V2_PAIR_CREATED_EVENT_HASH =
+  '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9';
+export const UNISWAP_V1_NEW_EXCHANGE_EVENT_HASH =
+  '0x9d42cb017eb05bd8944ab536a8b35bc68085931dd5f4356489801453923953f9';
 
-export const UNISWAP_V1_NEW_EXCHANGE_EVENT = 'event NewExchange(address,address)';
+export const UNISWAP_V1_NEW_EXCHANGE_EVENT =
+  'event NewExchange(address,address)';
 export const UNISWAP_V2_PAIR_CREATED_EVENT =
   'event PairCreated(address indexed token0, address indexed token1, address pair, uint)';
 export const UNISWAP_V3_POOL_CREATED_EVENT =
   'event PoolCreated(address indexed token0, address indexed token1, uint24 indexed fee, int24 tickSpacing, address pool)';
 
-export const PROP_HOUSE_DAO_DEPLOYED_EVENT_HASH = '0x456d2baf5a87d70e586ec06fb91c2d7849778dd41d80fa826a6ea5bf8d28e3a6';
-export const PROP_HOUSE_DAO_DEPLOYED_EVENT = 'event DAODeployed(address,address,address,address,address)';
+export const PROP_HOUSE_DAO_DEPLOYED_EVENT_HASH =
+  '0x456d2baf5a87d70e586ec06fb91c2d7849778dd41d80fa826a6ea5bf8d28e3a6';
+export const PROP_HOUSE_DAO_DEPLOYED_EVENT =
+  'event DAODeployed(address,address,address,address,address)';
 
 // https://docs.openzeppelin.com/contracts/4.x/api/governance#IGovernor
 export const GOVERNOR_METHOD_SIGNATURES = [
@@ -292,7 +318,9 @@ export const GOVERNOR_METHOD_SIGNATURES = [
   'castVoteWithReason(uint256,uint8,string)',
   'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)',
 ];
-export const GOVERNOR_METHODS = createSignatureMapping(GOVERNOR_METHOD_SIGNATURES);
+export const GOVERNOR_METHODS = createSignatureMapping(
+  GOVERNOR_METHOD_SIGNATURES,
+);
 
 export const TOKEN_SWAP_CONTRACTS = [
   '0xe592427a0aece92de3edee1f18e0157c05861564', // Uniswap V3 Router
@@ -388,9 +416,16 @@ export const OLD_NFT_ADDRESSES = [
   '0x323a3e1693e7a0959f65972f3bf2dfcb93239dfe', // Digital Art Chain
   '0x552d72f86f04098a4eaeda6d7b665ac12f846ad2', // Dark Winds
 ];
-export const ERC721_TRANSFER_EVENT_1 = 'event Transfer(address indexed,address indexed,uint256)';
-export const ERC721_TRANSFER_EVENT_2 = 'event Transfer(address,address,uint256)';
+export const ERC721_TRANSFER_EVENT_1 =
+  'event Transfer(address indexed,address indexed,uint256)';
+export const ERC721_TRANSFER_EVENT_2 =
+  'event Transfer(address,address,uint256)';
 
-export const PROXY_IMPLEMENTATION_METHOD_SIGNATURES = ['implementation()', 'IMPL()'];
+export const PROXY_IMPLEMENTATION_METHOD_SIGNATURES = [
+  'implementation()',
+  'IMPL()',
+];
 
-export const PROXY_IMPLEMENTATION_METHODS = createSignatureMapping(PROXY_IMPLEMENTATION_METHOD_SIGNATURES);
+export const PROXY_IMPLEMENTATION_METHODS = createSignatureMapping(
+  PROXY_IMPLEMENTATION_METHOD_SIGNATURES,
+);
