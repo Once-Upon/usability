@@ -1,5 +1,5 @@
 import { Contract } from './contract';
-import { AssetTransfer } from './assetTransfer';
+import { AssetTransfer } from './asset';
 
 export type StdObj = Record<string, unknown>;
 

@@ -1,7 +1,11 @@
-import type {
-  RawBlock,
-  NetAssetTransfer,
-  NetAssetTransfers,
+import {
+  type RawBlock,
+  type NetAssetTransfers,
+  type Asset,
+  AssetType,
+  ERC1155Asset,
+  ERC20Asset,
+  ETHAsset,
 } from '../../types';
 
 export function transform(block: RawBlock) {
@@ -13,7 +17,7 @@ export function transform(block: RawBlock) {
       continue;
     }
 
-    const assetsById: Record<string, NetAssetTransfer> = {};
+    const assetsById: Record<string, Asset> = {};
     const netAssetsByAddress: Record<string, Record<string, bigint>> = {};
 
     for (const txfer of assetTransfers) {
@@ -21,7 +25,8 @@ export function transform(block: RawBlock) {
         continue;
       }
 
-      let asset: NetAssetTransfer;
+      let asset: Asset | undefined = undefined;
+      let assetValue = BigInt(0);
       switch (txfer.type) {
         case 'erc721':
           asset = {
@@ -29,8 +34,8 @@ export function transform(block: RawBlock) {
             id: `${txfer.asset}-${txfer.tokenId}`,
             tokenId: txfer.tokenId,
             type: txfer.type,
-            value: '1',
           };
+          assetValue = BigInt(1);
           break;
         case 'erc1155':
           asset = {
@@ -40,6 +45,7 @@ export function transform(block: RawBlock) {
             type: txfer.type,
             value: txfer.value,
           };
+          assetValue = BigInt(txfer.value);
           break;
         case 'erc20':
           asset = {
@@ -48,18 +54,19 @@ export function transform(block: RawBlock) {
             type: txfer.type,
             value: txfer.value,
           };
+          assetValue = BigInt(txfer.value);
           break;
         case 'eth':
           asset = {
-            asset: 'eth',
             id: 'eth',
             type: txfer.type,
             value: txfer.value,
           };
+          assetValue = BigInt(txfer.value);
           break;
       }
 
-      if (!asset.id || !asset.value || asset.value === '0') {
+      if (!asset?.id) {
         continue;
       }
 
@@ -70,40 +77,63 @@ export function transform(block: RawBlock) {
         netAssetsByAddress[txfer.to] = {};
       }
       if (!netAssetsByAddress[txfer.from][asset.id]) {
-        netAssetsByAddress[txfer.from][asset.id] = toBigNumber(0);
+        netAssetsByAddress[txfer.from][asset.id] = BigInt(0);
       }
       if (!netAssetsByAddress[txfer.to][asset.id]) {
-        netAssetsByAddress[txfer.to][asset.id] = toBigNumber(0);
+        netAssetsByAddress[txfer.to][asset.id] = BigInt(0);
       }
 
       assetsById[asset.id] = asset;
-      netAssetsByAddress[txfer.from][asset.id] = netAssetsByAddress[txfer.from][
-        asset.id
-      ].minus(asset.value);
-      netAssetsByAddress[txfer.to][asset.id] = netAssetsByAddress[txfer.to][
-        asset.id
-      ].plus(asset.value);
+      netAssetsByAddress[txfer.from][asset.id] =
+        netAssetsByAddress[txfer.from][asset.id] - BigInt(assetValue);
+      netAssetsByAddress[txfer.to][asset.id] =
+        netAssetsByAddress[txfer.to][asset.id] + BigInt(assetValue);
     }
 
     const netAssetTransfers: NetAssetTransfers = {};
     for (const [address, assets] of Object.entries(netAssetsByAddress)) {
       for (const [id, value] of Object.entries(assets)) {
-        if (value.eq(0)) {
-          continue;
-        }
         if (!netAssetTransfers[address]) {
           netAssetTransfers[address] = { received: [], sent: [] };
         }
-        if (value.lt(0)) {
+
+        const type = assetsById[id].type;
+        if (type === AssetType.ERC721) {
           netAssetTransfers[address].sent.push({
             ...assetsById[id],
-            value: value.multipliedBy(-1).toString(),
           });
         } else {
-          netAssetTransfers[address].received.push({
-            ...assetsById[id],
-            value: value.toString(),
-          });
+          if (value === BigInt(0)) {
+            continue;
+          }
+
+          let asset: Asset | undefined = undefined;
+          switch (assetsById[id].type) {
+            case AssetType.ERC1155:
+              asset = assetsById[id] as ERC1155Asset;
+              asset.value =
+                value > BigInt(0)
+                  ? value.toString()
+                  : (value * BigInt(-1)).toString();
+              netAssetTransfers[address].received.push(asset);
+              break;
+            case AssetType.ERC20:
+              asset = assetsById[id] as ERC20Asset;
+              asset.value =
+                value > BigInt(0)
+                  ? value.toString()
+                  : (value * BigInt(-1)).toString();
+              netAssetTransfers[address].received.push(asset);
+              break;
+            case AssetType.ETH:
+              asset = assetsById[id] as ETHAsset;
+              asset.value =
+                value > BigInt(0)
+                  ? value.toString()
+                  : (value * BigInt(-1)).toString();
+              netAssetTransfers[address].received.push(asset);
+              break;
+          }
         }
       }
     }

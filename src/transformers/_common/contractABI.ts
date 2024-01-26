@@ -27,9 +27,8 @@ export function transform(block: RawBlock): TransactionContract[] {
               isGnosisSafe: false,
               whatsAbiSelectors: [],
               isProxy: false,
-              whatsAbiAbi: {
-                type: 'constructor',
-              },
+              whatsAbiAbi: [],
+              tokenMetadata: { tokenStandard: '' },
             };
           }
           // Get just the callable selectors

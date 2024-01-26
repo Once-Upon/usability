@@ -1,6 +1,5 @@
 import { StdObj, FragmentType, ParamType } from './shared';
-import { AssetTransfer } from './assetTransfer';
-import { NetAssetTransfers } from './netAssetTransfer';
+import { AssetTransfer, NetAssetTransfers } from './asset';
 import { RawReceipt } from './log';
 import { Contract } from './contract';
 

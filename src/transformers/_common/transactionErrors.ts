@@ -1,4 +1,4 @@
-import type { RawBlock } from '../types';
+import type { RawBlock } from '../../types';
 
 export function transform(block: RawBlock) {
   const allTxErrors: { hash: string; errors: string[] }[] = [];

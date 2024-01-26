@@ -1,9 +1,12 @@
-import BigNumber from 'bignumber.js';
-import Web3 from 'web3';
-
-import { decodeEVMAddress, toBigNumber } from '../helpers/utils';
-import type { AssetTransfer, RawBlock, RawTransaction } from '../types';
+import { decodeEVMAddress } from '../../helpers/utils';
+import {
+  AssetType,
+  type AssetTransfer,
+  type RawBlock,
+  type RawTransaction,
+} from '../../types';
 import { KNOWN_ADDRESSES } from '../../helpers/constants';
+import { decodeAbiParameters, Hex } from 'viem';
 
 // 1. pull out token transfers from logs
 // 2. pull out ETH transfers from traces (this covers tx.value transfers)
@@ -17,21 +20,21 @@ const TRANSFER_SIGNATURES = {
   ERC721: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
 
   // event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)
-  ERC1155_SINGLE: '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+  ERC1155_SINGLE:
+    '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
 
   // event TransferBatch(address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] values)
-  ERC1155_BATCH: '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
+  ERC1155_BATCH:
+    '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
 
   // event Deposit(address indexed dst, uint wad)
-  WETH_DEPOSIT_ERC20: '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c',
+  WETH_DEPOSIT_ERC20:
+    '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c',
 
   // event Withdrawal(address indexed src, uint wad)
-  WETH_WITHDRAW_ERC20: '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
+  WETH_WITHDRAW_ERC20:
+    '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
 };
-
-// @NOTE: we do *not* need access to an RPC here
-//        we just need an instance of Web3 in order to decode some log params
-const web3 = new Web3();
 
 function getTokenTransfers(tx: RawTransaction) {
   const txAssetTransfers: AssetTransfer[] = [];
@@ -49,29 +52,29 @@ function getTokenTransfers(tx: RawTransaction) {
             asset: log.address,
             from: decodeEVMAddress(log.topics[1]),
             to: decodeEVMAddress(log.topics[2]),
-            tokenId: toBigNumber(log.topics[3]).toString(),
-            type: 'erc721',
+            tokenId: BigInt(log.topics[3]).toString(),
+            type: AssetType.ERC721,
           });
         } else {
           txAssetTransfers.push({
             asset: log.address,
             from: decodeEVMAddress(log.topics[1]),
             to: decodeEVMAddress(log.topics[2]),
-            value: toBigNumber(log.data).toString(),
-            type: 'erc20',
+            value: BigInt(log.data).toString(),
+            type: AssetType.ERC20,
           });
         }
         continue;
       }
 
       case TRANSFER_SIGNATURES.ERC1155_SINGLE: {
-        const { tokenId, value } = web3.eth.abi.decodeParameters(
+        const [tokenId, value] = decodeAbiParameters(
           [
             { name: 'tokenId', type: 'uint256' },
             { name: 'value', type: 'uint256' },
           ],
-          log.data
-        ) as { tokenId: BigNumber; value: BigNumber };
+          log.data as Hex,
+        );
 
         txAssetTransfers.push({
           asset: log.address,
@@ -79,19 +82,19 @@ function getTokenTransfers(tx: RawTransaction) {
           to: decodeEVMAddress(log.topics[3]),
           tokenId: tokenId.toString(),
           value: value.toString(),
-          type: 'erc1155',
+          type: AssetType.ERC1155,
         });
         continue;
       }
 
       case TRANSFER_SIGNATURES.ERC1155_BATCH: {
-        const { tokenIds, values } = web3.eth.abi.decodeParameters(
+        const [tokenIds, values] = decodeAbiParameters(
           [
             { name: 'tokenIds', type: 'uint256[]' },
             { name: 'values', type: 'uint256[]' },
           ],
-          log.data
-        ) as { tokenIds: BigNumber[]; values: BigNumber[] };
+          log.data as Hex,
+        );
 
         for (let tokenIdx = 0; tokenIdx < tokenIds.length; tokenIdx += 1) {
           txAssetTransfers.push({
@@ -100,7 +103,7 @@ function getTokenTransfers(tx: RawTransaction) {
             to: decodeEVMAddress(log.topics[3]),
             tokenId: tokenIds[tokenIdx].toString(),
             value: values[tokenIdx].toString(),
-            type: 'erc1155',
+            type: AssetType.ERC1155,
           });
         }
         continue;
@@ -115,8 +118,8 @@ function getTokenTransfers(tx: RawTransaction) {
           asset: log.address,
           from: KNOWN_ADDRESSES.NULL,
           to: decodeEVMAddress(log.topics[1]),
-          value: toBigNumber(log.data).toString(),
-          type: 'erc20',
+          value: BigInt(log.data).toString(),
+          type: AssetType.ERC20,
         });
         continue;
       }
@@ -130,8 +133,8 @@ function getTokenTransfers(tx: RawTransaction) {
           asset: log.address,
           from: decodeEVMAddress(log.topics[1]),
           to: KNOWN_ADDRESSES.NULL,
-          value: toBigNumber(log.data).toString(),
-          type: 'erc20',
+          value: BigInt(log.data).toString(),
+          type: AssetType.ERC20,
         });
         continue;
       }
@@ -159,10 +162,12 @@ export function transform(block: RawBlock) {
     // then group by contract
     const tokenTransfersByContract: Record<string, AssetTransfer[]> = {};
     for (const transfer of tokenTransfers) {
-      if (!tokenTransfersByContract[transfer.asset]) {
-        tokenTransfersByContract[transfer.asset] = [];
+      if (transfer.type !== AssetType.ETH) {
+        if (!tokenTransfersByContract[transfer.asset]) {
+          tokenTransfersByContract[transfer.asset] = [];
+        }
+        tokenTransfersByContract[transfer.asset].push(transfer);
       }
-      tokenTransfersByContract[transfer.asset].push(transfer);
     }
 
     // now prepare a final set of *all* asset transfers (including ETH)
@@ -173,21 +178,28 @@ export function transform(block: RawBlock) {
       // check for ETH transfers
       if (trace.action.callType !== 'delegatecall') {
         // track contract suicides
-        if (trace.type === 'suicide' && trace.action.balance && trace.action.balance !== '0x0') {
+        if (
+          trace.type === 'suicide' &&
+          trace.action.balance &&
+          trace.action.balance !== '0x0'
+        ) {
           assetTransfers.push({
             from: trace.action.address,
-            to: trace.action.refundAddress,
-            type: 'eth',
-            value: toBigNumber(trace.action.balance).toString(),
+            to: trace.action.refundAddress ?? '',
+            type: AssetType.ETH,
+            value: BigInt(trace.action.balance).toString(),
           });
         }
         // otherwise track ETH transfers
         else if (trace.action.value && trace.action.value !== '0x0') {
           assetTransfers.push({
             from: trace.action.from,
-            to: trace.type === 'create' ? trace.result.address : trace.action.to,
-            type: 'eth',
-            value: toBigNumber(trace.action.value).toString(),
+            to:
+              trace.type === 'create'
+                ? trace.result.address ?? ''
+                : trace.action.to ?? '',
+            type: AssetType.ETH,
+            value: BigInt(trace.action.value).toString(),
           });
         }
       }

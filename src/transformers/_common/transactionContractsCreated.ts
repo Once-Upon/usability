@@ -1,14 +1,15 @@
 import { keccak256 } from 'web3-utils';
-import type { RawBlock, Contract } from '../types';
+import type { RawBlock, Contract } from '../../types';
 
+type ResultType = {
+  contracts: Contract[];
+  hash: string;
+};
 export function transform(block: RawBlock) {
-  const results: {
-    contracts: Contract[];
-    hash: string;
-  }[] = [];
+  const results: ResultType[] = [];
 
   for (const tx of block.transactions) {
-    const result = {
+    const result: ResultType = {
       contracts: [],
       hash: tx.hash,
     };
@@ -16,16 +17,23 @@ export function transform(block: RawBlock) {
     for (let i = 0; i < tx.traces.length; i += 1) {
       const trace = tx.traces[i];
 
-      if ((trace.type === 'create' || trace.type == 'create2') && trace.result) {
+      if (
+        (trace.type === 'create' || trace.type == 'create2') &&
+        trace.result
+      ) {
         // Basic Create Contract Details
         const isoTimestamp = new Date(block.timestamp * 1000).toISOString();
+        if (!trace.result.address) {
+          continue;
+        }
 
         const contract: Contract = {
           deployer: tx.from,
           directDeployer: trace.action.from,
           address: trace.result.address,
           bytecode: trace.result.code,
-          fingerprint: trace.result.code !== '0x0' ? keccak256(trace.result.code) : '', // TODO - need a way to avoid validation errors
+          fingerprint:
+            trace.result.code !== '0x0' ? keccak256(trace.result.code) : '', // TODO - need a way to avoid validation errors
           gas: trace.action.gas, // TOOD - do we convert with bignumber here?
           gasUsed: trace.result.gasUsed, // TODO - do we convert with bignumber here?
           blockNumber: block.number,

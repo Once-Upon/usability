@@ -1,5 +1,5 @@
-import type { Contract, RawBlock, TransactionContract } from '../types';
-import { bytecodeIsERC721 } from '../helpers/utils';
+import type { Contract, RawBlock, TransactionContract } from '../../types';
+import { bytecodeIsERC721 } from '../../helpers/utils';
 
 export function transform(block: RawBlock): TransactionContract[] {
   const results: { hash: string; contracts: Contract[] }[] = [];

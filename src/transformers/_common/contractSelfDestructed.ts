@@ -1,16 +1,22 @@
-import { toBigNumber } from '../helpers/utils';
-import type { RawBlock } from '../types';
+import type { RawBlock, Contract } from '../../types';
 
-type ContractSelfDestructed = { address: string; refundAddress: string; balance: string };
+type ContractSelfDestructed = {
+  address: string;
+  refundAddress: string;
+  balance: string;
+};
+
+type ResultType = {
+  contractsCreated: Contract[];
+  contractSelfDestructed: ContractSelfDestructed[];
+  hash: string;
+};
 
 export function transform(block: RawBlock) {
-  const results: {
-    contractSelfDestructed: ContractSelfDestructed[];
-    hash: string;
-  }[] = [];
+  const results: ResultType[] = [];
 
   for (const tx of block.transactions) {
-    const result = {
+    const result: ResultType = {
       contractsCreated: [],
       contractSelfDestructed: [],
       hash: tx.hash,
@@ -22,8 +28,10 @@ export function transform(block: RawBlock) {
       if (trace.type === 'suicide' && trace.action) {
         result.contractSelfDestructed.push({
           address: trace.action.address,
-          balance: toBigNumber(trace.action.balance).toString(),
-          refundAddress: trace.action.refundAddress,
+          balance: trace.action.balance
+            ? BigInt(trace.action.balance).toString()
+            : '0',
+          refundAddress: trace.action.refundAddress ?? '',
         });
       }
     }

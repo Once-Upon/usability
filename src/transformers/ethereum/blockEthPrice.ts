@@ -33,15 +33,26 @@ const uniSwapV3ETHPools = new Set<string>([
 ]);
 
 export function transform(block: RawBlock) {
-  const result: { number: number; price?: number; priceSource?: 'ETHERSCAN' | 'UNISWAP' } = { number: block.number };
+  const result: {
+    number: number;
+    price?: number;
+    priceSource?: 'ETHERSCAN' | 'UNISWAP';
+  } = { number: block.number };
   const date = new Date(block.timestamp * 1000);
   const swaps: { price: BigNumber; volume: BigNumber }[] = [];
 
   // if we're pre UniSwap usage (~ February 2019), then use Etherscan prices
   if (block.number < 7207017) {
     // only track the price for the block right at midnight
-    if (date.getUTCHours() === 0 && date.getUTCMinutes() === 0 && date.getUTCSeconds() < 30) {
-      result.price = etherscanPriceByDay[`${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`];
+    if (
+      date.getUTCHours() === 0 &&
+      date.getUTCMinutes() === 0 &&
+      date.getUTCSeconds() < 30
+    ) {
+      result.price =
+        etherscanPriceByDay[
+          `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`
+        ];
       result.priceSource = 'ETHERSCAN';
     }
   }
@@ -52,7 +63,8 @@ export function transform(block: RawBlock) {
       for (const log of tx.receipt.logs) {
         if (
           log.address === uniSwapV1USDC &&
-          log.topics[0] === '0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca'
+          log.topics[0] ===
+            '0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca'
         ) {
           const usd = toBigNumber(log.topics[3]).div(USD_DECIMALS);
           if (usd.gte(MIN_USD_AMOUNT_TO_CONSIDER)) {
@@ -73,7 +85,8 @@ export function transform(block: RawBlock) {
         // check V2 swap logs
         if (
           uniSwapV2ETHPools.has(log.address) &&
-          log.topics[0] === '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' &&
+          log.topics[0] ===
+            '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822' &&
           log.topics.length === 3
         ) {
           const params = decodeEvent(
@@ -81,19 +94,49 @@ export function transform(block: RawBlock) {
               {
                 anonymous: false,
                 inputs: [
-                  { indexed: true, internalType: 'address', name: 'sender', type: 'address' },
-                  { indexed: false, internalType: 'uint256', name: 'amount0In', type: 'uint256' },
-                  { indexed: false, internalType: 'uint256', name: 'amount1In', type: 'uint256' },
-                  { indexed: false, internalType: 'uint256', name: 'amount0Out', type: 'uint256' },
-                  { indexed: false, internalType: 'uint256', name: 'amount1Out', type: 'uint256' },
-                  { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+                  {
+                    indexed: true,
+                    internalType: 'address',
+                    name: 'sender',
+                    type: 'address',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint256',
+                    name: 'amount0In',
+                    type: 'uint256',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint256',
+                    name: 'amount1In',
+                    type: 'uint256',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint256',
+                    name: 'amount0Out',
+                    type: 'uint256',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint256',
+                    name: 'amount1Out',
+                    type: 'uint256',
+                  },
+                  {
+                    indexed: true,
+                    internalType: 'address',
+                    name: 'to',
+                    type: 'address',
+                  },
                 ],
                 name: 'Swap',
                 type: 'event',
               },
             ],
             log.topics,
-            log.data
+            log.data,
           );
 
           // first 4 data params are possible amounts, only 2 are used
@@ -103,7 +146,8 @@ export function transform(block: RawBlock) {
         // and check V3 swap logs
         else if (
           uniSwapV3ETHPools.has(log.address) &&
-          log.topics[0] === '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67' &&
+          log.topics[0] ===
+            '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67' &&
           log.topics.length === 3
         ) {
           const params = decodeEvent(
@@ -111,20 +155,55 @@ export function transform(block: RawBlock) {
               {
                 anonymous: false,
                 inputs: [
-                  { indexed: true, internalType: 'address', name: 'sender', type: 'address' },
-                  { indexed: true, internalType: 'address', name: 'recipient', type: 'address' },
-                  { indexed: false, internalType: 'int256', name: 'amount0', type: 'int256' },
-                  { indexed: false, internalType: 'int256', name: 'amount1', type: 'int256' },
-                  { indexed: false, internalType: 'uint160', name: 'sqrtPriceX96', type: 'uint160' },
-                  { indexed: false, internalType: 'uint128', name: 'liquidity', type: 'uint128' },
-                  { indexed: false, internalType: 'int24', name: 'tick', type: 'int24' },
+                  {
+                    indexed: true,
+                    internalType: 'address',
+                    name: 'sender',
+                    type: 'address',
+                  },
+                  {
+                    indexed: true,
+                    internalType: 'address',
+                    name: 'recipient',
+                    type: 'address',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'int256',
+                    name: 'amount0',
+                    type: 'int256',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'int256',
+                    name: 'amount1',
+                    type: 'int256',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint160',
+                    name: 'sqrtPriceX96',
+                    type: 'uint160',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'uint128',
+                    name: 'liquidity',
+                    type: 'uint128',
+                  },
+                  {
+                    indexed: false,
+                    internalType: 'int24',
+                    name: 'tick',
+                    type: 'int24',
+                  },
                 ],
                 name: 'Swap',
                 type: 'event',
               },
             ],
             log.topics,
-            log.data
+            log.data,
           );
 
           // first 2 data params are possible amounts, one is always negative
@@ -133,13 +212,18 @@ export function transform(block: RawBlock) {
 
         if (amounts.length >= 2) {
           // because ETH has 3x the decimals, it will always be the larger number prior to normalizing
-          let [usd, eth] = amounts.filter((a) => a.gt(0)).sort((a, b) => (a.gt(b) ? 1 : -1));
+          let [usd, eth] = amounts
+            .filter((a) => a.gt(0))
+            .sort((a, b) => (a.gt(b) ? 1 : -1));
           if (!usd || !eth) {
             continue;
           }
 
           usd = usd.div(USD_DECIMALS);
-          if (usd.gte(MIN_USD_AMOUNT_TO_CONSIDER) && usd.lte(MAX_USD_AMOUNT_TO_CONSIDER)) {
+          if (
+            usd.gte(MIN_USD_AMOUNT_TO_CONSIDER) &&
+            usd.lte(MAX_USD_AMOUNT_TO_CONSIDER)
+          ) {
             eth = eth.div(ETH_DECIMALS);
             swaps.push({ price: usd.dividedBy(eth), volume: usd });
           }
@@ -150,8 +234,13 @@ export function transform(block: RawBlock) {
 
   // compute a quick Volume Weight Average Price (VWAP) for the block
   if (swaps.length) {
-    const totalVolume = swaps.reduce((a, b) => a.plus(b.volume), toBigNumber(0));
-    const price = swaps.reduce((a, b) => a.plus(b.price.multipliedBy(b.volume)), toBigNumber(0)).div(totalVolume);
+    const totalVolume = swaps.reduce(
+      (a, b) => a.plus(b.volume),
+      toBigNumber(0),
+    );
+    const price = swaps
+      .reduce((a, b) => a.plus(b.price.multipliedBy(b.volume)), toBigNumber(0))
+      .div(totalVolume);
     result.price = price.decimalPlaces(2).toNumber();
     result.priceSource = 'UNISWAP';
   }

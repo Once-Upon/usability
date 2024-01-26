@@ -1,4 +1,5 @@
-import { StdObj, AbiItem } from './shared';
+import { StdObj } from './shared';
+import { ABI } from './abi';
 
 export type Contract = {
   chainId?: number;
@@ -12,7 +13,7 @@ export type Contract = {
   blockNumber: number;
   transactionHash: string;
   type: 'create' | 'create2';
-  metadata?: ContractMetadata;
+  metadata: ContractMetadata;
   supportedInterfaces?: SupportedInterfaces;
   sigHash: string;
   internalSigHashes: string[];
@@ -43,10 +44,10 @@ export type ContractMetadata = {
   simplehash?: StdObj;
   tally?: TallyMetadata;
   whatsAbiSelectors: string[];
-  whatsAbiAbi: AbiItem;
+  whatsAbiAbi: ABI;
   isProxy: boolean;
   implementationAddress?: string;
-  tokenMetadata?: TokenMetadata;
+  tokenMetadata: TokenMetadata;
 };
 
 export type SupportedInterfaces = Record<string, boolean>;
