@@ -416,10 +416,55 @@ export const OLD_NFT_ADDRESSES = [
   '0x323a3e1693e7a0959f65972f3bf2dfcb93239dfe', // Digital Art Chain
   '0x552d72f86f04098a4eaeda6d7b665ac12f846ad2', // Dark Winds
 ];
-export const ERC721_TRANSFER_EVENT_1 =
-  'event Transfer(address indexed,address indexed,uint256)';
-export const ERC721_TRANSFER_EVENT_2 =
-  'event Transfer(address,address,uint256)';
+export const ERC721_TRANSFER_EVENT_1 = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'from',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+] as const;
+
+export const ERC721_TRANSFER_EVENT_2 = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        name: 'from',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+] as const;
 
 export const PROXY_IMPLEMENTATION_METHOD_SIGNATURES = [
   'implementation()',

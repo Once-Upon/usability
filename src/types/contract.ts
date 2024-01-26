@@ -94,3 +94,11 @@ export type TokenMetadata = {
   symbol?: string;
   decimals?: number;
 };
+
+export type PropHouseDao = {
+  token: string;
+  metadata: string;
+  auction: string;
+  treasury: string;
+  governor: string;
+};

@@ -8,4 +8,5 @@ export type RawBlock = StdObj & {
   transactions: RawTransaction[];
   gasUsed: string;
   gasLimit: string;
+  baseFeePerGas: number | string;
 };

@@ -1,14 +1,13 @@
-import type { RawBlock, RawTransaction } from '../types';
-import { toBigNumber } from '../helpers/utils';
+import type { RawBlock, RawTransaction } from '../../types';
 import { FORKS } from '../../helpers/constants';
 
 export function transform(block: RawBlock) {
   const newTxs: Partial<RawTransaction>[] = [];
 
   for (const tx of block.transactions) {
-    const transactionFee = toBigNumber(tx.receipt.gasUsed)
-      .multipliedBy(toBigNumber(tx.receipt.effectiveGasPrice))
-      .toString();
+    const transactionFee = (
+      BigInt(tx.receipt.gasUsed) * BigInt(tx.receipt.effectiveGasPrice)
+    ).toString();
 
     let burntFees = '0';
     let minerFees = transactionFee;
@@ -20,11 +19,13 @@ export function transform(block: RawBlock) {
      * including respective base fees and tips."
      */
     if (tx.type === 2 && block.number >= FORKS.london) {
-      burntFees = toBigNumber(block.baseFeePerGas).multipliedBy(toBigNumber(tx.receipt.gasUsed)).toString();
-      minerFees = toBigNumber(tx.receipt.effectiveGasPrice)
-        .minus(toBigNumber(block.baseFeePerGas))
-        .multipliedBy(toBigNumber(tx.receipt.gasUsed))
-        .toString();
+      burntFees = (
+        BigInt(block.baseFeePerGas) * BigInt(tx.receipt.gasUsed)
+      ).toString();
+      minerFees = (
+        (BigInt(tx.receipt.effectiveGasPrice) - BigInt(block.baseFeePerGas)) *
+        BigInt(tx.receipt.gasUsed)
+      ).toString();
     }
 
     newTxs.push({

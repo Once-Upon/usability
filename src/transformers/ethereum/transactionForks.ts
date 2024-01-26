@@ -1,4 +1,4 @@
-import type { RawBlock } from '../types';
+import type { RawBlock } from '../../types';
 import { FORKS } from '../../helpers/constants';
 
 export function transform(block: RawBlock) {
@@ -10,5 +10,7 @@ export function transform(block: RawBlock) {
     }
   }
 
-  return block.transactions?.slice().map((tx) => ({ hash: tx.hash, fork })) || [];
+  return (
+    block.transactions?.slice().map((tx) => ({ hash: tx.hash, fork })) || []
+  );
 }
