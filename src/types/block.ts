@@ -6,4 +6,6 @@ export type RawBlock = StdObj & {
   number: number;
   timestamp: number;
   transactions: RawTransaction[];
+  gasUsed: string;
+  gasLimit: string;
 };

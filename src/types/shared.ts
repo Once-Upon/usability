@@ -1,6 +1,14 @@
+import { Contract } from './contract';
+import { AssetTransfer } from './assetTransfer';
+
 export type StdObj = Record<string, unknown>;
 
-export type AssetType = 'erc20' | 'erc721' | 'erc1155' | 'eth';
+export enum AssetType {
+  ETH = 'eth',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
+}
 /** ABI */
 
 export type AbiType =
@@ -37,3 +45,43 @@ export interface AbiOutput {
   components?: AbiOutput[];
   internalType?: string;
 }
+
+export type TransactionContract = {
+  hash: string;
+  contracts: Contract[];
+};
+
+export type transactionAssetTransfers = {
+  hash: string;
+  assetTransfers: AssetTransfer[];
+};
+
+export type InternalHashType = {
+  sigHash: string;
+  from: string;
+  to?: string;
+};
+
+export type TransactionWithHash = {
+  hash: string;
+  sigHash: string;
+  internalSigHashes: InternalHashType[];
+};
+
+export type FragmentType =
+  | 'constructor'
+  | 'error'
+  | 'event'
+  | 'fallback'
+  | 'function'
+  | 'struct';
+
+export type ParamType = {
+  name: string;
+  type: string;
+  baseType: string;
+  indexed: null | boolean;
+  components: null | ReadonlyArray<ParamType>;
+  arrayLength: null | number;
+  arrayChildren: null | ParamType;
+};

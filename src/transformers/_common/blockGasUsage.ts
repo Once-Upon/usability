@@ -1,14 +1,11 @@
-import { toBigNumber } from '../helpers/utils';
-import type { RawBlock } from '../types';
+import type { RawBlock } from '../../types';
 
 export function transform(block: RawBlock) {
-  const gasUsedPercentage = toBigNumber(block.gasUsed)
-    .multipliedBy(100)
-    .dividedBy(toBigNumber(block.gasLimit))
-    .toString();
+  const gasUsedPercentage =
+    (BigInt(block.gasUsed) * BigInt(100)) / BigInt(block.gasLimit);
 
   return {
     number: block.number,
-    gasUsedPercentage,
+    gasUsedPercentage: gasUsedPercentage.toString(),
   };
 }

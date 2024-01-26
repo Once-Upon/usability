@@ -1,5 +1,5 @@
 import { whatsabi } from '@shazow/whatsabi';
-import type { Contract, RawBlock, TransactionContract } from '../types';
+import type { Contract, RawBlock, TransactionContract } from '../../types';
 
 export function transform(block: RawBlock): TransactionContract[] {
   const results: { hash: string; contracts: Contract[] }[] = [];
@@ -12,14 +12,37 @@ export function transform(block: RawBlock): TransactionContract[] {
     const contracts = tx.contracts
       .map((txContract) => {
         try {
+          if (!txContract.metadata) {
+            txContract.metadata = {
+              isUniswapV3: false,
+              isUniswapV2: false,
+              isUniswapV1: false,
+              uniswapPairs: [],
+              isPropHouseToken: false,
+              isPropHouseMetadata: false,
+              isPropHouseAuction: false,
+              isPropHouseTreasury: false,
+              isPropHouseGovernor: false,
+              isGenericGovernance: false,
+              isGnosisSafe: false,
+              whatsAbiSelectors: [],
+              isProxy: false,
+              whatsAbiAbi: {
+                type: 'constructor',
+              },
+            };
+          }
           // Get just the callable selectors
-          txContract.metadata.whatsAbiSelectors = whatsabi.selectorsFromBytecode(txContract.bytecode);
+          txContract.metadata.whatsAbiSelectors =
+            whatsabi.selectorsFromBytecode(txContract.bytecode);
           // Get an ABI-like list of interfaces
-          txContract.metadata.whatsAbiAbi = whatsabi.abiFromBytecode(txContract.bytecode);
+          txContract.metadata.whatsAbiAbi = whatsabi.abiFromBytecode(
+            txContract.bytecode,
+          );
 
           return txContract;
         } catch (e) {
-          return null;
+          return txContract;
         }
       })
       .filter((v) => v);

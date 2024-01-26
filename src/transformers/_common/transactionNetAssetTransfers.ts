@@ -1,6 +1,8 @@
-import BigNumber from 'bignumber.js';
-import type { RawBlock, NetAssetTransfer, NetAssetTransfers } from '../types';
-import { toBigNumber } from '../helpers/utils';
+import type {
+  RawBlock,
+  NetAssetTransfer,
+  NetAssetTransfers,
+} from '../../types';
 
 export function transform(block: RawBlock) {
   const results: { hash: string; netAssetTransfers: NetAssetTransfers }[] = [];
@@ -12,7 +14,7 @@ export function transform(block: RawBlock) {
     }
 
     const assetsById: Record<string, NetAssetTransfer> = {};
-    const netAssetsByAddress: Record<string, Record<string, BigNumber>> = {};
+    const netAssetsByAddress: Record<string, Record<string, bigint>> = {};
 
     for (const txfer of assetTransfers) {
       if (txfer.from === txfer.to || !txfer.from || !txfer.to) {
@@ -20,29 +22,41 @@ export function transform(block: RawBlock) {
       }
 
       let asset: NetAssetTransfer;
-      if (txfer.type === 'erc721' || txfer.type === 'erc1155') {
-        asset = {
-          asset: txfer.asset,
-          id: `${txfer.asset}-${txfer.tokenId}`,
-          tokenId: txfer.tokenId,
-          type: txfer.type,
-          value: txfer.value || '1',
-        };
-      } else if (txfer.type === 'erc20') {
-        asset = {
-          asset: txfer.asset,
-          id: txfer.asset,
-          tokenId: txfer.tokenId,
-          type: txfer.type,
-          value: txfer.value,
-        };
-      } else if (txfer.type === 'eth') {
-        asset = {
-          asset: 'eth',
-          id: 'eth',
-          type: txfer.type,
-          value: txfer.value,
-        };
+      switch (txfer.type) {
+        case 'erc721':
+          asset = {
+            asset: txfer.asset,
+            id: `${txfer.asset}-${txfer.tokenId}`,
+            tokenId: txfer.tokenId,
+            type: txfer.type,
+            value: '1',
+          };
+          break;
+        case 'erc1155':
+          asset = {
+            asset: txfer.asset,
+            id: `${txfer.asset}-${txfer.tokenId}`,
+            tokenId: txfer.tokenId,
+            type: txfer.type,
+            value: txfer.value,
+          };
+          break;
+        case 'erc20':
+          asset = {
+            asset: txfer.asset,
+            id: `${txfer.asset}`,
+            type: txfer.type,
+            value: txfer.value,
+          };
+          break;
+        case 'eth':
+          asset = {
+            asset: 'eth',
+            id: 'eth',
+            type: txfer.type,
+            value: txfer.value,
+          };
+          break;
       }
 
       if (!asset.id || !asset.value || asset.value === '0') {
@@ -63,8 +77,12 @@ export function transform(block: RawBlock) {
       }
 
       assetsById[asset.id] = asset;
-      netAssetsByAddress[txfer.from][asset.id] = netAssetsByAddress[txfer.from][asset.id].minus(asset.value);
-      netAssetsByAddress[txfer.to][asset.id] = netAssetsByAddress[txfer.to][asset.id].plus(asset.value);
+      netAssetsByAddress[txfer.from][asset.id] = netAssetsByAddress[txfer.from][
+        asset.id
+      ].minus(asset.value);
+      netAssetsByAddress[txfer.to][asset.id] = netAssetsByAddress[txfer.to][
+        asset.id
+      ].plus(asset.value);
     }
 
     const netAssetTransfers: NetAssetTransfers = {};
@@ -77,9 +95,15 @@ export function transform(block: RawBlock) {
           netAssetTransfers[address] = { received: [], sent: [] };
         }
         if (value.lt(0)) {
-          netAssetTransfers[address].sent.push({ ...assetsById[id], value: value.multipliedBy(-1).toString() });
+          netAssetTransfers[address].sent.push({
+            ...assetsById[id],
+            value: value.multipliedBy(-1).toString(),
+          });
         } else {
-          netAssetTransfers[address].received.push({ ...assetsById[id], value: value.toString() });
+          netAssetTransfers[address].received.push({
+            ...assetsById[id],
+            value: value.toString(),
+          });
         }
       }
     }

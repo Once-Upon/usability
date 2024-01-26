@@ -1,4 +1,8 @@
-import type { RawBlock, TransactionWithHash, InternalHashType } from '../types';
+import type {
+  RawBlock,
+  TransactionWithHash,
+  InternalHashType,
+} from '../../types';
 
 export function transform(block: RawBlock): TransactionWithHash[] {
   const result: TransactionWithHash[] = block.transactions.map((tx) => {

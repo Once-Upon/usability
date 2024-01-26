@@ -1,4 +1,4 @@
-import { StdObj } from './shared';
+import { StdObj, AbiItem } from './shared';
 
 export type Contract = {
   chainId?: number;
@@ -43,7 +43,7 @@ export type ContractMetadata = {
   simplehash?: StdObj;
   tally?: TallyMetadata;
   whatsAbiSelectors: string[];
-  // whatsAbiAbi: ethers.InterfaceAbi;
+  whatsAbiAbi: AbiItem;
   isProxy: boolean;
   implementationAddress?: string;
   tokenMetadata?: TokenMetadata;

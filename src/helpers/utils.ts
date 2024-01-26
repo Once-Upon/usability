@@ -160,3 +160,14 @@ export const getTokenDecimals = async (token): Promise<number> => {
     return 18;
   }
 };
+
+export function decodeEVMAddress(addressString: string): string {
+  if (!addressString) return '';
+
+  const buf = Buffer.from(addressString.replace(/^0x/, ''), 'hex');
+  if (!buf.slice(0, 12).equals(Buffer.alloc(12, 0))) {
+    return '';
+  }
+  const address = '0x' + buf.toString('hex', 12, 32); // grab the last 20 bytes
+  return address.toLocaleLowerCase();
+}

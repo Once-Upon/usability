@@ -1,10 +1,10 @@
-import { StdObj } from './shared';
+import { StdObj, FragmentType, ParamType } from './shared';
 
 export type LogDescription = {
   fragment: {
     name: string;
-    // type: ethers.FragmentType;
-    // inputs: ReadonlyArray<ethers.ParamType>;
+    type: FragmentType;
+    inputs: ReadonlyArray<ParamType>;
     anonymous: boolean;
   };
   name: string;

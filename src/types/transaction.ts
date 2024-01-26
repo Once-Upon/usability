@@ -1,4 +1,4 @@
-import { StdObj } from './shared';
+import { StdObj, FragmentType, ParamType } from './shared';
 import { AssetTransfer } from './assetTransfer';
 import { NetAssetTransfers } from './netAssetTransfer';
 import { RawReceipt } from './log';
@@ -59,9 +59,9 @@ export type RawTrace = StdObj & {
 export type TransactionDescription = {
   fragment: {
     name: string;
-    // type: ethers.FragmentType;
-    // inputs: ReadonlyArray<ethers.ParamType>;
-    // outputs: ReadonlyArray<ethers.ParamType>;
+    type: FragmentType;
+    inputs: ReadonlyArray<ParamType>;
+    outputs: ReadonlyArray<ParamType>;
     constant: boolean;
     stateMutability: 'payable' | 'nonpayable' | 'view' | 'pure';
     payable: boolean;

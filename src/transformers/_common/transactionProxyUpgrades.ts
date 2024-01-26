@@ -1,6 +1,6 @@
-import type { RawBlock, RawTransaction } from '../types';
+import type { RawBlock, RawTransaction } from '../../types';
 import { TRANSPARENT_UPGRADEABLE_PROXY_EVENTS } from '../../helpers/constants';
-import { decodeEVMAddress } from '../helpers/utils';
+import { decodeEVMAddress } from '../../helpers/utils';
 
 type ProxyUpgrade = { hash: string; address: string; upgradedAddress: string };
 
@@ -9,7 +9,9 @@ function getProxyUpgrades(tx: RawTransaction): ProxyUpgrade[] {
   for (const log of tx.receipt.logs) {
     const [signature] = log.topics;
     // detect upgrade event
-    if (signature === TRANSPARENT_UPGRADEABLE_PROXY_EVENTS['Upgraded(address)']) {
+    if (
+      signature === TRANSPARENT_UPGRADEABLE_PROXY_EVENTS['Upgraded(address)']
+    ) {
       // store proxy upgrades
       const address = log.address.toLowerCase();
       let upgradedAddress = '';
