@@ -1,39 +1,34 @@
 import type { RawBlock, RawTransaction } from '../../types';
-import { FORKS } from '../../helpers/constants';
 
 export function transform(block: RawBlock) {
   const newTxs: Partial<RawTransaction>[] = [];
 
   for (const tx of block.transactions) {
-    const transactionFee = (
-      BigInt(tx.receipt.gasUsed) * BigInt(tx.receipt.effectiveGasPrice)
-    ).toString();
+    let totalL2FeeWei = BigInt(0);
+    if (tx.gasPrice) {
+      const l2GasPrice = BigInt(tx.gasPrice);
+      const l2GasUsed = BigInt(tx.receipt?.gasUsed ?? 0);
 
-    let burntFees = '0';
-    let minerFees = transactionFee;
+      const tenToTheEighteenth = BigInt('1000000000000000000');
 
-    /***
-     * Legacy tx after EIP1559 https://legacy.ethgasstation.info/blog/eip-1559/
-     * "EIP-1559 will still be able to facilitate legacy style transactions.
-     * When these transactions come in their gas prices are simply converted into fee caps,
-     * including respective base fees and tips."
-     */
-    if (tx.type === 2 && block.number >= FORKS.london) {
-      burntFees = (
-        BigInt(block.baseFeePerGas) * BigInt(tx.receipt.gasUsed)
-      ).toString();
-      minerFees = (
-        (BigInt(tx.receipt.effectiveGasPrice) - BigInt(block.baseFeePerGas)) *
-        BigInt(tx.receipt.gasUsed)
-      ).toString();
+      const l1FeeContribution = !tx.receipt?.l1GasUsed
+        ? BigInt(0)
+        : (BigInt(tx.receipt?.l1GasPrice ?? 0) *
+            BigInt(tx.receipt.l1GasUsed) *
+            BigInt(
+              parseFloat(tx.receipt?.l1FeeScalar ?? '0') * Math.pow(10, 18),
+            )) /
+          tenToTheEighteenth;
+
+      const l2FeeContribution = l2GasPrice * l2GasUsed;
+
+      totalL2FeeWei = l2FeeContribution + l1FeeContribution;
     }
 
     newTxs.push({
       hash: tx.hash,
       baseFeePerGas: block.baseFeePerGas,
-      burntFees,
-      minerFees,
-      transactionFee,
+      transactionFee: totalL2FeeWei.toString(),
     });
   }
 

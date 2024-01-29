@@ -11,6 +11,7 @@ export type RawTransaction = StdObj & {
   input: string;
   value: string;
   receipt: RawReceipt;
+  gasPrice: string;
   to: string;
   traces: RawTrace[];
   contracts?: Contract[];

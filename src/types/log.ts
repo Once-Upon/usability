@@ -25,6 +25,9 @@ export type RawReceipt = StdObj & {
   logs: RawLog[];
   gasUsed: number | string;
   effectiveGasPrice: number | string;
+  l1GasPrice?: string;
+  l1GasUsed?: string;
+  l1FeeScalar?: string;
 };
 
 export type EventLogTopics = [
