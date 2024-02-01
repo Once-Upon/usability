@@ -5,6 +5,7 @@ import { transform as transactionContractsCreatedTransform } from './transformer
 import { transform as transactionDelegateCallsTransform } from './transformers/_common/transactionDelegateCalls';
 import { transform as transactionDerivativesNeighborsTransform } from './transformers/_common/transactionDerivativesNeighbors';
 import { transform as transactionErrorsTransform } from './transformers/_common/transactionErrors';
+import { transform as transactionNetAssetTransfersTransform } from './transformers/_common/transactionNetAssetTransfers';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -17,6 +18,7 @@ describe('transformations', () => {
         wr.hash ===
         '0x9e7654743c06585d5754ee9cfd087b50f431484d53a757d57d5b51144e51bc95',
     );
+    expect(ethTx).toBeDefined();
     if (ethTx) {
       const ethTransfers = ethTx.assetTransfers;
       expect(ethTransfers.length).toBe(1);
@@ -32,6 +34,7 @@ describe('transformations', () => {
         wr.hash ===
         '0x020b4772754a0caf0512c43da6275d6f8c9000f3915850639f799a254d70bccb',
     );
+    expect(wethDepositTx).toBeDefined();
     if (wethDepositTx) {
       const wethDepositTransfers = wethDepositTx.assetTransfers.filter(
         (t) => 'asset' in t && t.asset === KNOWN_ADDRESSES.WETH,
@@ -56,6 +59,7 @@ describe('transformations', () => {
         wr.hash ===
         '0x2496fa85b6046f44b0ae0ee6315db0757cad9f7c0c9fdb17a807169937bc3870',
     );
+    expect(wethWithdrawalTx).toBeDefined();
     if (wethWithdrawalTx) {
       const wethWithdrawalTransfers = wethWithdrawalTx.assetTransfers.filter(
         (t) => 'asset' in t && t.asset === KNOWN_ADDRESSES.WETH,
@@ -86,6 +90,7 @@ describe('transformations', () => {
         rr.hash ===
         '0x7899aabe7417de87d1c4c28c320d7c6781021cee2b11bfb81440132d4413ee87',
     );
+    expect(refundTx).toBeDefined();
     if (refundTx) {
       const refundTransfers = refundTx.assetTransfers;
       expect(refundTransfers.length).toBe(3);
@@ -101,6 +106,7 @@ describe('transformations', () => {
         tx.hash ===
         '0xd175f7d3e34f46e68a036fcccb8abbd3610095e753bd64f50586e4ec51e94167',
     );
+    expect(comboTx).toBeDefined();
     if (comboTx) {
       const comboTransfers = comboTx.assetTransfers;
       expect(comboTransfers.length).toBe(5);
@@ -171,5 +177,31 @@ describe('transformations', () => {
     const errors = result.map((tx) => tx.errors).flat();
     expect(errors.length).toBe(6);
     expect(errors.every((e) => e.length > 0)).toBe(true);
+  });
+
+  it('transactionNetAssetTransfers', () => {
+    const block = loadBlockFixture('ethereum', 16628971);
+    const result = transactionNetAssetTransfersTransform(block);
+    console.log('result', result);
+    const comboTx = result.find(
+      (tx) =>
+        tx.hash ===
+        '0xd175f7d3e34f46e68a036fcccb8abbd3610095e753bd64f50586e4ec51e94167',
+    );
+    expect(comboTx).toBeDefined();
+    if (comboTx) {
+      const comboTransfers = comboTx.netAssetTransfers;
+      expect(Object.keys(comboTransfers).length).toBe(4);
+      expect(comboTransfers[KNOWN_ADDRESSES.NULL].sent.length).toBe(0);
+      expect(comboTransfers[KNOWN_ADDRESSES.NULL].received).toStrictEqual([
+        {
+          asset: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          id: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          tokenId: undefined,
+          type: 'erc20',
+          value: '1813694121453461568',
+        },
+      ]);
+    }
   });
 });
