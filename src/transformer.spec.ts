@@ -2,6 +2,7 @@ import { loadBlockFixture } from './helpers/utils';
 import { KNOWN_ADDRESSES } from './helpers/constants';
 import { transform as transactionNetAssetTransferTransform } from './transformers/_common/transactionAssetTransfers';
 import { transform as transactionContractsCreatedTransform } from './transformers/_common/transactionContractsCreated';
+import { transform as transactionDelegateCallsTransform } from './transformers/_common/transactionDelegateCalls';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -131,5 +132,23 @@ describe('transformations', () => {
     expect(
       contractedCreated.slice(4).every((c) => c.deployer === c.directDeployer),
     ).toBe(true);
+  });
+
+  it('transactionDelegateCalls', () => {
+    const block = loadBlockFixture('ethereum', 14573289);
+    const result = transactionDelegateCallsTransform(block);
+
+    const resultTxHashes = result.map((r) => r.hash);
+
+    for (const tx of block.transactions) {
+      const idx = resultTxHashes.indexOf(tx.hash);
+      if (idx < 0) {
+        continue;
+      }
+
+      expect(result[idx].delegateCalls).toStrictEqual(
+        tx.traces.filter((t) => t.action.callType === 'delegatecall'),
+      );
+    }
   });
 });
