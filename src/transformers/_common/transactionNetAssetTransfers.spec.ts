@@ -1,11 +1,24 @@
+import { transform as transactionAssetTransfers } from './transactionAssetTransfers';
 import { transform } from './transactionNetAssetTransfers';
-import { loadBlockFixture } from '../../helpers/utils';
+import {
+  loadBlockFixture,
+  updateBlockWithTransactions,
+} from '../../helpers/utils';
 import { KNOWN_ADDRESSES } from '../../helpers/constants';
 
 describe('transactionNetAssetTransfers', () => {
   it('should return net asset transfers', () => {
     const block = loadBlockFixture('ethereum', 16628971);
-    const result = transform(block);
+    const assetResult = transactionAssetTransfers(block);
+    console.log(
+      'assetResult',
+      assetResult.find(
+        (tx) =>
+          tx.hash ===
+          '0xd175f7d3e34f46e68a036fcccb8abbd3610095e753bd64f50586e4ec51e94167',
+      )?.assetTransfers,
+    );
+    const result = transform(updateBlockWithTransactions(block, assetResult));
     const comboTx = result.find(
       (tx) =>
         tx.hash ===
@@ -14,6 +27,7 @@ describe('transactionNetAssetTransfers', () => {
     expect(comboTx).toBeDefined();
     if (comboTx) {
       const comboTransfers = comboTx.netAssetTransfers;
+      console.log('comboTx.netAssetTransfers', comboTx.netAssetTransfers);
       expect(Object.keys(comboTransfers).length).toBe(4);
       expect(comboTransfers[KNOWN_ADDRESSES.NULL].sent.length).toBe(0);
       expect(comboTransfers[KNOWN_ADDRESSES.NULL].received).toStrictEqual([

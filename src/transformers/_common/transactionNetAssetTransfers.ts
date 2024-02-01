@@ -20,49 +20,53 @@ export function transform(block: RawBlock) {
     const assetsById: Record<string, Asset> = {};
     const netAssetsByAddress: Record<string, Record<string, bigint>> = {};
 
-    for (const txfer of assetTransfers) {
-      if (txfer.from === txfer.to || !txfer.from || !txfer.to) {
+    for (const assetTransfer of assetTransfers) {
+      if (
+        assetTransfer.from === assetTransfer.to ||
+        !assetTransfer.from ||
+        !assetTransfer.to
+      ) {
         continue;
       }
 
       let asset: Asset | undefined = undefined;
       let assetValue = BigInt(0);
-      switch (txfer.type) {
+      switch (assetTransfer.type) {
         case 'erc721':
           asset = {
-            asset: txfer.asset,
-            id: `${txfer.asset}-${txfer.tokenId}`,
-            tokenId: txfer.tokenId,
-            type: txfer.type,
+            asset: assetTransfer.asset,
+            id: `${assetTransfer.asset}-${assetTransfer.tokenId}`,
+            tokenId: assetTransfer.tokenId,
+            type: assetTransfer.type,
           };
           assetValue = BigInt(1);
           break;
         case 'erc1155':
           asset = {
-            asset: txfer.asset,
-            id: `${txfer.asset}-${txfer.tokenId}`,
-            tokenId: txfer.tokenId,
-            type: txfer.type,
-            value: txfer.value,
+            asset: assetTransfer.asset,
+            id: `${assetTransfer.asset}-${assetTransfer.tokenId}`,
+            tokenId: assetTransfer.tokenId,
+            type: assetTransfer.type,
+            value: assetTransfer.value,
           };
-          assetValue = BigInt(txfer.value);
+          assetValue = BigInt(assetTransfer.value);
           break;
         case 'erc20':
           asset = {
-            asset: txfer.asset,
-            id: `${txfer.asset}`,
-            type: txfer.type,
-            value: txfer.value,
+            asset: assetTransfer.asset,
+            id: `${assetTransfer.asset}`,
+            type: assetTransfer.type,
+            value: assetTransfer.value,
           };
-          assetValue = BigInt(txfer.value);
+          assetValue = BigInt(assetTransfer.value);
           break;
         case 'eth':
           asset = {
             id: 'eth',
-            type: txfer.type,
-            value: txfer.value,
+            type: assetTransfer.type,
+            value: assetTransfer.value,
           };
-          assetValue = BigInt(txfer.value);
+          assetValue = BigInt(assetTransfer.value);
           break;
       }
 
@@ -70,24 +74,24 @@ export function transform(block: RawBlock) {
         continue;
       }
 
-      if (!netAssetsByAddress[txfer.from]) {
-        netAssetsByAddress[txfer.from] = {};
+      if (!netAssetsByAddress[assetTransfer.from]) {
+        netAssetsByAddress[assetTransfer.from] = {};
       }
-      if (!netAssetsByAddress[txfer.to]) {
-        netAssetsByAddress[txfer.to] = {};
+      if (!netAssetsByAddress[assetTransfer.to]) {
+        netAssetsByAddress[assetTransfer.to] = {};
       }
-      if (!netAssetsByAddress[txfer.from][asset.id]) {
-        netAssetsByAddress[txfer.from][asset.id] = BigInt(0);
+      if (!netAssetsByAddress[assetTransfer.from][asset.id]) {
+        netAssetsByAddress[assetTransfer.from][asset.id] = BigInt(0);
       }
-      if (!netAssetsByAddress[txfer.to][asset.id]) {
-        netAssetsByAddress[txfer.to][asset.id] = BigInt(0);
+      if (!netAssetsByAddress[assetTransfer.to][asset.id]) {
+        netAssetsByAddress[assetTransfer.to][asset.id] = BigInt(0);
       }
 
       assetsById[asset.id] = asset;
-      netAssetsByAddress[txfer.from][asset.id] =
-        netAssetsByAddress[txfer.from][asset.id] - BigInt(assetValue);
-      netAssetsByAddress[txfer.to][asset.id] =
-        netAssetsByAddress[txfer.to][asset.id] + BigInt(assetValue);
+      netAssetsByAddress[assetTransfer.from][asset.id] =
+        netAssetsByAddress[assetTransfer.from][asset.id] - BigInt(assetValue);
+      netAssetsByAddress[assetTransfer.to][asset.id] =
+        netAssetsByAddress[assetTransfer.to][asset.id] + BigInt(assetValue);
     }
 
     const netAssetTransfers: NetAssetTransfers = {};
