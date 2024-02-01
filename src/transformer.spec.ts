@@ -7,7 +7,7 @@ describe('transformations', () => {
     const wethResult = transformer.transform(wethBlock);
 
     // testing direct ETH transfer in tx: https://www.onceupon.gg/finder/0x9e7654743c06585d5754ee9cfd087b50f431484d53a757d57d5b51144e51bc95
-    const ethTx = wethResult.find(
+    const ethTx = wethResult.transactions.find(
       (wr) =>
         wr.hash ===
         '0x9e7654743c06585d5754ee9cfd087b50f431484d53a757d57d5b51144e51bc95',

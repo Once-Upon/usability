@@ -12,12 +12,12 @@ import {
 import { RawBlock, StdObj } from '../types';
 
 export const makeTransform = (
-  children: Record<string, (block: any) => any>,
+  children: Record<string, (block: RawBlock) => StdObj[]>,
 ) => {
-  return (block: any): any => {
+  return (block: RawBlock): RawBlock => {
     let result = block;
     for (const childTransformer of Object.values(children)) {
-      const updatedTx = childTransformer(block);
+      const updatedTx = childTransformer(result);
       result = updateBlockWithTransactions(result, updatedTx);
     }
     return result;
