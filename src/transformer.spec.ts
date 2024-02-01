@@ -8,6 +8,7 @@ import { transform as transactionErrorsTransform } from './transformers/_common/
 import { transform as transactionNetAssetTransfersTransform } from './transformers/_common/transactionNetAssetTransfers';
 import { transform as transactionPartiesTransform } from './transformers/_common/transactionParties';
 import { transform as transactionSigHashTransform } from './transformers/_common/transactionSigHash';
+import { transform as transactionTimestampTransform } from './transformers/_common/transactionTimestamp';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -344,6 +345,18 @@ describe('transformations', () => {
           sigHash: '0x2f745c59',
         },
       ]);
+    }
+  });
+
+  it('transactionTimestamp', () => {
+    const block = loadBlockFixture('ethereum', 14573289);
+    const result = transactionTimestampTransform(block);
+
+    for (let i = 0; i < block.transactions.length; i += 1) {
+      expect(result[i].timestamp).toBe(block.timestamp);
+      expect(result[i].isoTimestamp).toBe(
+        new Date(block.timestamp * 1000).toISOString(),
+      );
     }
   });
 });
