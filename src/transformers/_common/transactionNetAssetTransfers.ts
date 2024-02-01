@@ -106,38 +106,46 @@ export function transform(block: RawBlock) {
         }
 
         const type = assetsById[id].type;
+        let assetTransferred: Asset = {
+          id: '',
+          type: AssetType.ETH,
+          value: '',
+        };
+
         if (type === AssetType.ERC721) {
-          netAssetTransfers[address].sent.push({
+          assetTransferred = {
             ...assetsById[id],
-          });
+          };
         } else {
-          let asset: Asset | undefined = undefined;
           switch (assetsById[id].type) {
             case AssetType.ERC1155:
-              asset = assetsById[id] as ERC1155Asset;
-              asset.value =
+              assetTransferred = assetsById[id] as ERC1155Asset;
+              assetTransferred.value =
                 value > BigInt(0)
                   ? value.toString()
                   : (value * BigInt(-1)).toString();
-              netAssetTransfers[address].received.push(asset);
               break;
             case AssetType.ERC20:
-              asset = assetsById[id] as ERC20Asset;
-              asset.value =
+              assetTransferred = assetsById[id] as ERC20Asset;
+              assetTransferred.value =
                 value > BigInt(0)
                   ? value.toString()
                   : (value * BigInt(-1)).toString();
-              netAssetTransfers[address].received.push(asset);
               break;
             case AssetType.ETH:
-              asset = assetsById[id] as ETHAsset;
-              asset.value =
+              assetTransferred = assetsById[id] as ETHAsset;
+              assetTransferred.value =
                 value > BigInt(0)
                   ? value.toString()
                   : (value * BigInt(-1)).toString();
-              netAssetTransfers[address].received.push(asset);
               break;
           }
+        }
+
+        if (value < BigInt(0)) {
+          netAssetTransfers[address].sent.push(assetTransferred);
+        } else {
+          netAssetTransfers[address].received.push(assetTransferred);
         }
       }
     }
