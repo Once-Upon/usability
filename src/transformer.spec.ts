@@ -7,6 +7,7 @@ import { transform as transactionDerivativesNeighborsTransform } from './transfo
 import { transform as transactionErrorsTransform } from './transformers/_common/transactionErrors';
 import { transform as transactionNetAssetTransfersTransform } from './transformers/_common/transactionNetAssetTransfers';
 import { transform as transactionPartiesTransform } from './transformers/_common/transactionParties';
+import { transform as transactionSigHashTransform } from './transformers/_common/transactionSigHash';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -300,6 +301,48 @@ describe('transformations', () => {
         '0x0000000000000000000000000000000000000001',
         '0x6bf249f802b9afc6d10af75eb45d4559858c81a1',
         '0x6e07bbf7fba8e43988aec5f2df6c40d1afb4400e',
+      ]);
+    }
+  });
+
+  it('transactionSigHash', () => {
+    const block = loadBlockFixture('ethereum', 13142655);
+    const result = transactionSigHashTransform(block);
+
+    const txResult = result.find(
+      (tx) =>
+        tx.hash ===
+        '0x044b142b9ef202512e24f233fbc0b87033dfa772ed74aeebaad4a9a3ea41c38a',
+    );
+    expect(txResult).toBeDefined();
+    if (txResult) {
+      expect(txResult.sigHash).toBe('0xaf182255');
+      expect(txResult.internalSigHashes).toStrictEqual([
+        {
+          from: '0x4cdf3d8b92fdde2fcdf7de29ee38fca4be90eed0',
+          to: '0x2e956ed3d7337f4ed4316a6e8f2edf74bf84bb54',
+          sigHash: '0xaf182255',
+        },
+        {
+          from: '0x2e956ed3d7337f4ed4316a6e8f2edf74bf84bb54',
+          to: '0x2252d401ec9d16065069529b053b105fe42e0176',
+          sigHash: '0x70a08231',
+        },
+        {
+          from: '0x2e956ed3d7337f4ed4316a6e8f2edf74bf84bb54',
+          to: '0x2252d401ec9d16065069529b053b105fe42e0176',
+          sigHash: '0x2f745c59',
+        },
+        {
+          from: '0x2e956ed3d7337f4ed4316a6e8f2edf74bf84bb54',
+          to: '0x2252d401ec9d16065069529b053b105fe42e0176',
+          sigHash: '0x2f745c59',
+        },
+        {
+          from: '0x2e956ed3d7337f4ed4316a6e8f2edf74bf84bb54',
+          to: '0x2252d401ec9d16065069529b053b105fe42e0176',
+          sigHash: '0x2f745c59',
+        },
       ]);
     }
   });
