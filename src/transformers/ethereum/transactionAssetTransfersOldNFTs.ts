@@ -46,46 +46,54 @@ function updateTokenTransfers(tx: RawTransaction) {
         }
 
         // check for old nfts
-        let logDescriptor = decodeEventLog({
-          abi: ERC721_TRANSFER_EVENT_1,
-          data: log.data as Hex,
-          topics: log.topics as EventLogTopics,
-        });
-        if (!logDescriptor) {
+        let logDescriptor;
+        try {
           logDescriptor = decodeEventLog({
-            abi: ERC721_TRANSFER_EVENT_2,
+            abi: ERC721_TRANSFER_EVENT_1,
             data: log.data as Hex,
             topics: log.topics as EventLogTopics,
           });
-          if (logDescriptor) {
+        } catch (err) {}
+
+        if (!logDescriptor) {
+          try {
+            logDescriptor = decodeEventLog({
+              abi: ERC721_TRANSFER_EVENT_2,
+              data: log.data as Hex,
+              topics: log.topics as EventLogTopics,
+            });
+          } catch (err) {}
+        }
+
+        if (logDescriptor) {
+          oldNFTsTransfers.push({
+            asset: log.address,
+            from: decodeEVMAddress(logDescriptor.args['from']),
+            to: decodeEVMAddress(logDescriptor.args['to']),
+            tokenId: BigInt(logDescriptor.args['value']).toString(),
+            type: AssetType.ERC721,
+          });
+        } else {
+          // if there's a 4th topic (indexed parameter), then it's an ERC721
+          if (log.topics.length === 4) {
             oldNFTsTransfers.push({
               asset: log.address,
-              from: logDescriptor.args[0] as string,
-              to: logDescriptor.args[1] as string,
-              tokenId: logDescriptor.args[2] as string,
+              from: decodeEVMAddress(log.topics[0]),
+              to: decodeEVMAddress(log.topics[1]),
+              tokenId: BigInt(log.topics[2]).toString(),
               type: AssetType.ERC721,
             });
           } else {
-            // if there's a 4th topic (indexed parameter), then it's an ERC721
-            if (log.topics.length === 4) {
-              oldNFTsTransfers.push({
-                asset: log.address,
-                from: decodeEVMAddress(log.topics[1]),
-                to: decodeEVMAddress(log.topics[2]),
-                tokenId: BigInt(log.topics[3]).toString(),
-                type: AssetType.ERC721,
-              });
-            } else {
-              oldNFTsTransfers.push({
-                asset: log.address,
-                from: decodeEVMAddress(log.topics[1]),
-                to: decodeEVMAddress(log.topics[2]),
-                tokenId: BigInt(log.data).toString(),
-                type: AssetType.ERC721,
-              });
-            }
+            oldNFTsTransfers.push({
+              asset: log.address,
+              from: decodeEVMAddress(log.topics[1]),
+              to: decodeEVMAddress(log.topics[2]),
+              tokenId: BigInt(log.data).toString(),
+              type: AssetType.ERC721,
+            });
           }
         }
+
         break;
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721:
         oldNFTsTransfers.push({
