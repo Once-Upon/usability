@@ -1,6 +1,7 @@
 import { loadBlockFixture } from './helpers/utils';
 import { KNOWN_ADDRESSES } from './helpers/constants';
 import { transform as transactionNetAssetTransferTransform } from './transformers/_common/transactionAssetTransfers';
+import { transform as transactionContractsCreatedTransform } from './transformers/_common/transactionContractsCreated';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -108,5 +109,27 @@ describe('transformations', () => {
         'eth',
       ]);
     }
+  });
+
+  it('TransactionContractsCreated', () => {
+    const block = loadBlockFixture('ethereum', 14918216);
+    const result = transactionContractsCreatedTransform(block);
+
+    expect(
+      block.transactions.filter((tx) => !!tx.receipt.contractAddress).length,
+    ).toBe(1);
+
+    // first check on contracts created
+    const contractedCreated = result.map((tx) => tx.contracts).flat();
+    expect(contractedCreated.length).toBe(5);
+    expect(contractedCreated.every((c) => !!c.address)).toBe(true);
+    expect(
+      contractedCreated
+        .slice(0, 4)
+        .every((c) => c.deployer !== c.directDeployer),
+    ).toBe(true);
+    expect(
+      contractedCreated.slice(4).every((c) => c.deployer === c.directDeployer),
+    ).toBe(true);
   });
 });
