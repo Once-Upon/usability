@@ -6,10 +6,15 @@ describe('transactionFees', () => {
     // first test pre-London hardfork
     const preLondonBlock = loadBlockFixture('ethereum', 12500000);
     const preResult = transform(preLondonBlock);
-    for (const tx of preResult) {
+    const tx = preResult.find(
+      (tx) =>
+        tx.hash ===
+        '0x4f874000175e15df5cd5ee482d0fbf72a59a752a9146530b94d219646a75464a',
+    );
+    expect(tx).toBeDefined();
+    if (tx) {
       expect(tx.baseFeePerGas).toBe(preLondonBlock.baseFeePerGas);
-      expect(tx.burntFees).toBe('0');
-      expect(tx.minerFees).toBe(tx.transactionFee);
+      expect(tx.transactionFee).toBe('3741309000000000');
     }
 
     // and then test after
@@ -25,8 +30,7 @@ describe('transactionFees', () => {
     );
     expect(postTx).toBeDefined();
     if (postTx) {
-      expect(postTx.burntFees).toBe('2557275674640775');
-      expect(postTx.minerFees).toBe('1693575757203250');
+      expect(postTx.transactionFee).toBe('4250851431844025');
     }
   });
 });

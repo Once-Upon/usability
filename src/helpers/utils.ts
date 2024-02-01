@@ -12,16 +12,15 @@ import {
 import { RawBlock, StdObj } from '../types';
 
 export const makeTransform = (
-  children: Record<string, (transaction: any) => any>,
+  children: Record<string, (block: any) => any>,
 ) => {
-  return (transaction: any): any => {
+  return (block: any): any => {
+    let result = block;
     for (const childTransformer of Object.values(children)) {
-      const result = childTransformer(transaction);
-      if (result) {
-        return result;
-      }
+      const updatedTx = childTransformer(block);
+      result = updateBlockWithTransactions(result, updatedTx);
     }
-    return transaction;
+    return result;
   };
 };
 
@@ -186,3 +185,16 @@ export function loadBlockFixture(chain: string, blockNumber: number): RawBlock {
   const block = normalizeBlock(rawBlock);
   return block;
 }
+
+export const updateBlockWithTransactions = (
+  block: RawBlock,
+  update: StdObj[],
+): RawBlock => {
+  return {
+    ...block,
+    transactions: block.transactions.map((tx) => ({
+      ...tx,
+      ...update.find((t) => t.hash === tx.hash),
+    })),
+  };
+};

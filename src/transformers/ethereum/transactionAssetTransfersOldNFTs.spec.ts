@@ -1,12 +1,20 @@
+import { transform as transactionAssetTransfers } from '../_common/transactionAssetTransfers';
 import { transform } from './transactionAssetTransfersOldNFTs';
-import { loadBlockFixture } from '../../helpers/utils';
+import {
+  loadBlockFixture,
+  updateBlockWithTransactions,
+} from '../../helpers/utils';
 
 describe('transactionAssetTransfersOldNFTs', () => {
-  it('should return transaction errors', () => {
+  it('should return transaction asset transfers old nfts', () => {
     // Special NFT transfers
     /** CryptoKitties */
     const cryptoKittiesBlock = loadBlockFixture('ethereum', 6082465);
-    const cryptoKittiesResult = transform(cryptoKittiesBlock);
+    const cryptoKittiesAssetResult =
+      transactionAssetTransfers(cryptoKittiesBlock);
+    const cryptoKittiesResult = transform(
+      updateBlockWithTransactions(cryptoKittiesBlock, cryptoKittiesAssetResult),
+    );
     const cryptoKittiesTx = cryptoKittiesResult.find(
       (tx) =>
         tx.hash ===
@@ -23,7 +31,14 @@ describe('transactionAssetTransfersOldNFTs', () => {
     }
     /** CryptoPunks New */
     const cryptoPunksNewBlock = loadBlockFixture('ethereum', 5774644);
-    const cryptoPunksNewResult = transform(cryptoPunksNewBlock);
+    const cryptoPunksNewAssetResult =
+      transactionAssetTransfers(cryptoPunksNewBlock);
+    const cryptoPunksNewResult = transform(
+      updateBlockWithTransactions(
+        cryptoPunksNewBlock,
+        cryptoPunksNewAssetResult,
+      ),
+    );
     const cryptoPunksNewTx = cryptoPunksNewResult.find(
       (tx) =>
         tx.hash ===
@@ -39,7 +54,14 @@ describe('transactionAssetTransfersOldNFTs', () => {
     }
     /** CryptoPunks Old */
     const cryptoPunksOldBlock = loadBlockFixture('ethereum', 3862484);
-    const cryptoPunksOldResult = transform(cryptoPunksOldBlock);
+    const cryptoPunksOldAssetResult =
+      transactionAssetTransfers(cryptoPunksOldBlock);
+    const cryptoPunksOldResult = transform(
+      updateBlockWithTransactions(
+        cryptoPunksOldBlock,
+        cryptoPunksOldAssetResult,
+      ),
+    );
     const cryptoPunksOldTx = cryptoPunksOldResult.find(
       (tx) =>
         tx.hash ===
@@ -55,7 +77,14 @@ describe('transactionAssetTransfersOldNFTs', () => {
     }
     /** CryptoStriker */
     const cryptoStrikersBlock = loadBlockFixture('ethereum', 15685187);
-    const cryptoStrikersResult = transform(cryptoStrikersBlock);
+    const cryptoStrikersAssetResult =
+      transactionAssetTransfers(cryptoStrikersBlock);
+    const cryptoStrikersResult = transform(
+      updateBlockWithTransactions(
+        cryptoStrikersBlock,
+        cryptoStrikersAssetResult,
+      ),
+    );
     const cryptoStrikersTx = cryptoStrikersResult.find(
       (tx) =>
         tx.hash ===
@@ -72,7 +101,14 @@ describe('transactionAssetTransfersOldNFTs', () => {
     }
     /** CryptoFighter */
     const cryptoFightersBlock = loadBlockFixture('ethereum', 16751455);
-    const cryptoFightersResult = transform(cryptoFightersBlock);
+    const cryptoFightersAssetResult =
+      transactionAssetTransfers(cryptoFightersBlock);
+    const cryptoFightersResult = transform(
+      updateBlockWithTransactions(
+        cryptoFightersBlock,
+        cryptoFightersAssetResult,
+      ),
+    );
     const cryptoFightersTx = cryptoFightersResult.find(
       (tx) =>
         tx.hash ===
