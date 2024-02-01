@@ -3,6 +3,8 @@ import { KNOWN_ADDRESSES } from './helpers/constants';
 import { transform as transactionNetAssetTransferTransform } from './transformers/_common/transactionAssetTransfers';
 import { transform as transactionContractsCreatedTransform } from './transformers/_common/transactionContractsCreated';
 import { transform as transactionDelegateCallsTransform } from './transformers/_common/transactionDelegateCalls';
+import { transform as transactionDerivativesNeighborsTransform } from './transformers/_common/transactionDerivativesNeighbors';
+import { transform as transactionErrorsTransform } from './transformers/_common/transactionErrors';
 
 describe('transformations', () => {
   it('TransactionAssetTransfers', () => {
@@ -150,5 +152,24 @@ describe('transformations', () => {
         tx.traces.filter((t) => t.action.callType === 'delegatecall'),
       );
     }
+  });
+
+  it('transactionDerivativesNeighbors', () => {
+    const testBlock = loadBlockFixture('ethereum', 13533772);
+    const testBlockResults =
+      transactionDerivativesNeighborsTransform(testBlock);
+
+    testBlockResults.forEach((tx) => {
+      // TODO - assert here
+    });
+  });
+
+  it('transactionErrors', () => {
+    const block = loadBlockFixture('ethereum', 14918216);
+    const result = transactionErrorsTransform(block);
+
+    const errors = result.map((tx) => tx.errors).flat();
+    expect(errors.length).toBe(6);
+    expect(errors.every((e) => e.length > 0)).toBe(true);
   });
 });
