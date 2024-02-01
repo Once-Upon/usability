@@ -97,6 +97,10 @@ export function transform(block: RawBlock) {
     const netAssetTransfers: NetAssetTransfers = {};
     for (const [address, assets] of Object.entries(netAssetsByAddress)) {
       for (const [id, value] of Object.entries(assets)) {
+        if (value === BigInt(0)) {
+          continue;
+        }
+
         if (!netAssetTransfers[address]) {
           netAssetTransfers[address] = { received: [], sent: [] };
         }
@@ -107,10 +111,6 @@ export function transform(block: RawBlock) {
             ...assetsById[id],
           });
         } else {
-          if (value === BigInt(0)) {
-            continue;
-          }
-
           let asset: Asset | undefined = undefined;
           switch (assetsById[id].type) {
             case AssetType.ERC1155:
