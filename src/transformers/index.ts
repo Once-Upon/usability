@@ -1,3 +1,4 @@
+import { RawBlock } from 'src/types';
 import { makeTransform } from '../helpers/utils';
 import * as transactionAssetTransfers from './_common/assetTransfers';
 import * as transactionDelegateCalls from './_common/delegateCalls';
@@ -31,7 +32,12 @@ const transformers = Object.fromEntries(
 
 const transform = makeTransform(transformers);
 
-export const transformer = {
+type UsabilityTransformer = {
+  transform: (block: RawBlock) => RawBlock;
+  children: Record<string, unknown>;
+};
+
+export const transformer: UsabilityTransformer = {
   transform,
   children,
 };
