@@ -174,7 +174,10 @@ export function decodeEVMAddress(addressString: string): string {
 }
 
 // Get block number from filenames in ../blocks/{chain}
-export function loadBlockFixture(chain: string, blockNumber: number): RawBlock {
+export function loadBlockFixture(
+  chain: string,
+  blockNumber: number | string,
+): RawBlock {
   // first load the raw data and parse it as a RawBlock
   const raw = fs
     .readFileSync(

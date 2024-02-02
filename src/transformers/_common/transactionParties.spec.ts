@@ -3,7 +3,7 @@ import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionParties', () => {
   it('should return transaction parties', () => {
-    const block = loadBlockFixture('ethereum', 17686037);
+    const block = loadBlockFixture('ethereum', '17686037_decode');
     const result = transform(block);
 
     const txResult = result.find(
@@ -23,7 +23,7 @@ describe('transactionParties', () => {
     }
 
     //The addresses sending/receiving in the assetTransfers should be in parties as well
-    const block1 = loadBlockFixture('ethereum', 6088920);
+    const block1 = loadBlockFixture('ethereum', '6088920_decode');
     const result1 = transform(block1);
 
     const txResult1 = result1.find(
@@ -37,7 +37,7 @@ describe('transactionParties', () => {
     }
 
     //NFT should be in parties
-    const block2 = loadBlockFixture('ethereum', 18230275);
+    const block2 = loadBlockFixture('ethereum', '18230275_decode');
     const result2 = transform(block2);
 
     const txResult2 = result2.find(
@@ -57,7 +57,7 @@ describe('transactionParties', () => {
     }
 
     // Zora Sepolia
-    const block3 = loadBlockFixture('zora_sepolia', 479884);
+    const block3 = loadBlockFixture('zora_sepolia', '479884_decode');
     const result3 = transform(block3);
     const txResult3 = result3.find(
       (tx) =>
@@ -78,7 +78,7 @@ describe('transactionParties', () => {
     }
 
     // Lyra Sepolia
-    const block4 = loadBlockFixture('lyra_sepolia', 3967804);
+    const block4 = loadBlockFixture('lyra_sepolia', '3967804_decode');
     const result4 = transform(block4);
 
     const txResult4 = result4.find(
