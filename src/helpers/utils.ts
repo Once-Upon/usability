@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import {
   ERC20_METHODS,
   ERC777_METHODS,
@@ -10,16 +12,15 @@ import {
 import { RawBlock, StdObj } from '../types';
 
 export const makeTransform = (
-  children: Record<string, (transaction: any) => any>,
+  children: Record<string, (block: RawBlock) => StdObj[]>,
 ) => {
-  return (transaction: any): any => {
+  return (block: RawBlock): RawBlock => {
+    let result = block;
     for (const childTransformer of Object.values(children)) {
-      const result = childTransformer(transaction);
-      if (result) {
-        return result;
-      }
+      const updatedTx = childTransformer(result);
+      result = updateBlockWithTransactions(result, updatedTx);
     }
-    return transaction;
+    return result;
   };
 };
 
@@ -171,3 +172,29 @@ export function decodeEVMAddress(addressString: string): string {
   const address = '0x' + buf.toString('hex', 12, 32); // grab the last 20 bytes
   return address.toLocaleLowerCase();
 }
+
+// Get block number from filenames in ../blocks/{chain}
+export function loadBlockFixture(chain: string, blockNumber: number): RawBlock {
+  // first load the raw data and parse it as a RawBlock
+  const raw = fs
+    .readFileSync(
+      path.join(__dirname, '..', 'blocks', chain, `${blockNumber}.json`),
+    )
+    .toString();
+  const rawBlock = JSON.parse(raw) as RawBlock;
+  const block = normalizeBlock(rawBlock);
+  return block;
+}
+
+export const updateBlockWithTransactions = (
+  block: RawBlock,
+  update: StdObj[],
+): RawBlock => {
+  return {
+    ...block,
+    transactions: block.transactions.map((tx) => ({
+      ...tx,
+      ...update.find((t) => t.hash === tx.hash),
+    })),
+  };
+};
