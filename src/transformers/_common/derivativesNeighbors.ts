@@ -1,9 +1,7 @@
-import type { RawBlock, Neighbor } from '../../types';
+import type { RawBlock } from '../../types';
 
-export function transform(block: RawBlock): Neighbor[] {
-  const result: Neighbor[] = [];
-  for (let i = 0; i < block.transactions.length; i++) {
-    const tx = block.transactions[i];
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     if (tx.assetTransfers) {
       const fromAddresses: Set<string> = new Set(
         (tx.assetTransfers as { from: string }[]).map(
@@ -20,13 +18,11 @@ export function transform(block: RawBlock): Neighbor[] {
         fromAddresses.has(tx.from) &&
         toAddresses.size === 1
       ) {
-        result.push({
-          hash: tx.hash,
-          neighbor: { address: tx.from, neighbor: [...toAddresses][0] },
-        });
+        tx.neighbor = { address: tx.from, neighbor: [...toAddresses][0] };
       }
     }
-  }
+    return tx;
+  });
 
-  return result;
+  return block;
 }

@@ -1,4 +1,4 @@
-import { transform } from './transactionDerivativesNeighbors';
+import { transform } from './derivativesNeighbors';
 import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionDerivativesNeighbors', () => {
@@ -6,7 +6,7 @@ describe('transactionDerivativesNeighbors', () => {
     const testBlock = loadBlockFixture('ethereum', 13533772);
     const testBlockResults = transform(testBlock);
 
-    testBlockResults.forEach((tx) => {
+    testBlockResults.transactions.forEach((tx) => {
       // TODO - assert here
     });
   });

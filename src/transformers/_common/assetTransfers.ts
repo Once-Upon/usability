@@ -147,13 +147,11 @@ function getTokenTransfers(tx: RawTransaction) {
   return txAssetTransfers;
 }
 
-export function transform(block: RawBlock) {
-  const results: { hash: string; assetTransfers: AssetTransfer[] }[] = [];
-
-  for (const tx of block.transactions) {
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     // don't count transfers for failed txs
     if (!tx.receipt.status) {
-      continue;
+      return tx;
     }
 
     // first get all of the token transfers from transaction logs
@@ -225,13 +223,11 @@ export function transform(block: RawBlock) {
     }
 
     if (assetTransfers.length > 0) {
-      results.push({
-        hash: tx.hash,
-        // @NOTE: current ETL codebase splits out `ethFlow` from `assetTransfers`
-        assetTransfers,
-      });
+      tx.assetTransfers = assetTransfers;
     }
-  }
 
-  return results;
+    return tx;
+  });
+
+  return block;
 }

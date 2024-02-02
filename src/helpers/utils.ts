@@ -12,15 +12,13 @@ import {
 import { RawBlock, StdObj } from '../types';
 
 export const makeTransform = (
-  children: Record<string, (block: RawBlock) => StdObj[]>,
+  children: Record<string, (block: RawBlock) => RawBlock>,
 ) => {
   return (block: RawBlock): RawBlock => {
-    let result = block;
     for (const childTransformer of Object.values(children)) {
-      const updatedTx = childTransformer(result);
-      result = updateBlockWithTransactions(result, updatedTx);
+      block = childTransformer(block);
     }
-    return result;
+    return block;
   };
 };
 
@@ -174,7 +172,10 @@ export function decodeEVMAddress(addressString: string): string {
 }
 
 // Get block number from filenames in ../blocks/{chain}
-export function loadBlockFixture(chain: string, blockNumber: number): RawBlock {
+export function loadBlockFixture(
+  chain: string,
+  blockNumber: number | string,
+): RawBlock {
   // first load the raw data and parse it as a RawBlock
   const raw = fs
     .readFileSync(
@@ -185,16 +186,3 @@ export function loadBlockFixture(chain: string, blockNumber: number): RawBlock {
   const block = normalizeBlock(rawBlock);
   return block;
 }
-
-export const updateBlockWithTransactions = (
-  block: RawBlock,
-  update: StdObj[],
-): RawBlock => {
-  return {
-    ...block,
-    transactions: block.transactions.map((tx) => ({
-      ...tx,
-      ...update.find((t) => t.hash === tx.hash),
-    })),
-  };
-};

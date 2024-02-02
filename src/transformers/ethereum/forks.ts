@@ -1,16 +1,12 @@
 import type { RawBlock } from '../../types';
 import { FORKS } from '../../helpers/constants';
 
-export function transform(block: RawBlock) {
-  let fork: string;
-
+export function transform(block: RawBlock): RawBlock {
   for (const [forkName, forkNumber] of Object.entries(FORKS)) {
     if (block.number >= forkNumber) {
-      fork = forkName;
+      block.fork = forkName;
     }
   }
 
-  return (
-    block.transactions?.slice().map((tx) => ({ hash: tx.hash, fork })) || []
-  );
+  return block;
 }

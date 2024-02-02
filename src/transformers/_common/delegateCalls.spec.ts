@@ -1,4 +1,4 @@
-import { transform } from './transactionDelegateCalls';
+import { transform } from './delegateCalls';
 import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionDelegateCalls', () => {
@@ -6,7 +6,7 @@ describe('transactionDelegateCalls', () => {
     const block = loadBlockFixture('ethereum', 14573289);
     const result = transform(block);
 
-    const resultTxHashes = result.map((r) => r.hash);
+    const resultTxHashes = result.transactions.map((r) => r.hash);
 
     for (const tx of block.transactions) {
       const idx = resultTxHashes.indexOf(tx.hash);
@@ -14,7 +14,7 @@ describe('transactionDelegateCalls', () => {
         continue;
       }
 
-      expect(result[idx].delegateCalls).toStrictEqual(
+      expect(result.transactions[idx].delegateCalls).toStrictEqual(
         tx.traces.filter((t) => t.action.callType === 'delegatecall'),
       );
     }

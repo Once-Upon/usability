@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import type { RawBlock } from '../../types';
 
-type TransactionWithParties = {
-  hash: string;
-  parties: string[];
-};
-export function transform(block: RawBlock): TransactionWithParties[] {
-  const result: TransactionWithParties[] = block.transactions.map((tx) => {
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     // from/to addresses
     let parties: string[] = [];
     if (tx.from) {
@@ -95,11 +91,10 @@ export function transform(block: RawBlock): TransactionWithParties[] {
       parties = [...parties, ...contractsCreated];
     }
 
-    return {
-      hash: tx.hash,
-      parties: [...new Set(parties)].filter((party) => party),
-    };
+    tx.parties = [...new Set(parties)].filter((party) => party);
+
+    return tx;
   });
 
-  return result;
+  return block;
 }
