@@ -19,6 +19,8 @@ export type RawTransaction = StdObj & {
   context: TxContext;
   assetTransfers: AssetTransfer[];
   netAssetTransfers: NetAssetTransfers;
+  errors: string[];
+  parties: string[];
 };
 
 export type RawTraceAction = StdObj & {

@@ -1,9 +1,7 @@
-import type { RawBlock, RawTransaction } from '../../types';
+import type { RawBlock } from '../../types';
 
-export function transform(block: RawBlock) {
-  const newTxs: Partial<RawTransaction>[] = [];
-
-  for (const tx of block.transactions) {
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     let totalL2FeeWei = BigInt(0);
     if (tx.gasPrice) {
       const l2GasPrice = BigInt(tx.gasPrice);
@@ -25,12 +23,11 @@ export function transform(block: RawBlock) {
       totalL2FeeWei = l2FeeContribution + l1FeeContribution;
     }
 
-    newTxs.push({
-      hash: tx.hash,
-      baseFeePerGas: block.baseFeePerGas,
-      transactionFee: totalL2FeeWei.toString(),
-    });
-  }
+    tx.baseFeePerGas = block.baseFeePerGas;
+    tx.transactionFee = totalL2FeeWei.toString();
 
-  return newTxs;
+    return tx;
+  });
+
+  return block;
 }

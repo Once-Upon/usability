@@ -1,4 +1,4 @@
-import { transform } from './transactionSigHash';
+import { transform } from './sigHash';
 import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionSigHash', () => {
@@ -6,7 +6,7 @@ describe('transactionSigHash', () => {
     const block = loadBlockFixture('ethereum', 13142655);
     const result = transform(block);
 
-    const txResult = result.find(
+    const txResult = result.transactions.find(
       (tx) =>
         tx.hash ===
         '0x044b142b9ef202512e24f233fbc0b87033dfa772ed74aeebaad4a9a3ea41c38a',

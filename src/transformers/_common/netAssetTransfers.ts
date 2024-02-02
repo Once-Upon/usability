@@ -8,13 +8,11 @@ import {
   ETHAsset,
 } from '../../types';
 
-export function transform(block: RawBlock) {
-  const results: { hash: string; netAssetTransfers: NetAssetTransfers }[] = [];
-
-  for (const tx of block.transactions) {
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     const assetTransfers = tx.assetTransfers;
     if (!assetTransfers?.length) {
-      continue;
+      return tx;
     }
 
     const assetsById: Record<string, Asset> = {};
@@ -151,12 +149,11 @@ export function transform(block: RawBlock) {
     }
 
     if (Object.keys(netAssetTransfers).length > 0) {
-      results.push({
-        hash: tx.hash,
-        netAssetTransfers,
-      });
+      tx.netAssetTransfers = netAssetTransfers;
     }
-  }
 
-  return results;
+    return tx;
+  });
+
+  return block;
 }

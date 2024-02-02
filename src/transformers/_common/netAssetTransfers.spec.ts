@@ -1,17 +1,14 @@
-import { transform as transactionAssetTransfers } from './transactionAssetTransfers';
-import { transform } from './transactionNetAssetTransfers';
-import {
-  loadBlockFixture,
-  updateBlockWithTransactions,
-} from '../../helpers/utils';
+import { transform as transactionAssetTransfers } from './assetTransfers';
+import { transform } from './netAssetTransfers';
+import { loadBlockFixture } from '../../helpers/utils';
 import { KNOWN_ADDRESSES } from '../../helpers/constants';
 
 describe('transactionNetAssetTransfers', () => {
   it('should return net asset transfers', () => {
     const block = loadBlockFixture('ethereum', 16628971);
     const assetResult = transactionAssetTransfers(block);
-    const result = transform(updateBlockWithTransactions(block, assetResult));
-    const comboTx = result.find(
+    const result = transform(assetResult);
+    const comboTx = result.transactions.find(
       (tx) =>
         tx.hash ===
         '0xd175f7d3e34f46e68a036fcccb8abbd3610095e753bd64f50586e4ec51e94167',

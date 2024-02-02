@@ -1,9 +1,6 @@
-import { transform as transactionAssetTransfers } from '../_common/transactionAssetTransfers';
-import { transform } from './transactionAssetTransfersOldNFTs';
-import {
-  loadBlockFixture,
-  updateBlockWithTransactions,
-} from '../../helpers/utils';
+import { transform as transactionAssetTransfers } from '../_common/assetTransfers';
+import { transform } from './assetTransfersOldNFTs';
+import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionAssetTransfersOldNFTs', () => {
   it('should return transaction asset transfers old nfts', () => {
@@ -12,10 +9,8 @@ describe('transactionAssetTransfersOldNFTs', () => {
     const cryptoKittiesBlock = loadBlockFixture('ethereum', 6082465);
     const cryptoKittiesAssetResult =
       transactionAssetTransfers(cryptoKittiesBlock);
-    const cryptoKittiesResult = transform(
-      updateBlockWithTransactions(cryptoKittiesBlock, cryptoKittiesAssetResult),
-    );
-    const cryptoKittiesTx = cryptoKittiesResult.find(
+    const cryptoKittiesResult = transform(cryptoKittiesAssetResult);
+    const cryptoKittiesTx = cryptoKittiesResult.transactions.find(
       (tx) =>
         tx.hash ===
         '0xcb6b23b24d3c0dd8d5ddaf8b9fae50c6742ff8bddf9fe18b4300b5e3ef73fea3',
@@ -33,13 +28,8 @@ describe('transactionAssetTransfersOldNFTs', () => {
     const cryptoPunksNewBlock = loadBlockFixture('ethereum', 5774644);
     const cryptoPunksNewAssetResult =
       transactionAssetTransfers(cryptoPunksNewBlock);
-    const cryptoPunksNewResult = transform(
-      updateBlockWithTransactions(
-        cryptoPunksNewBlock,
-        cryptoPunksNewAssetResult,
-      ),
-    );
-    const cryptoPunksNewTx = cryptoPunksNewResult.find(
+    const cryptoPunksNewResult = transform(cryptoPunksNewAssetResult);
+    const cryptoPunksNewTx = cryptoPunksNewResult.transactions.find(
       (tx) =>
         tx.hash ===
         '0x0da4c50900119b47400d71a9dd3563571145e4e362b952c36a9e38c77f7d25bb',
@@ -56,13 +46,8 @@ describe('transactionAssetTransfersOldNFTs', () => {
     const cryptoPunksOldBlock = loadBlockFixture('ethereum', 3862484);
     const cryptoPunksOldAssetResult =
       transactionAssetTransfers(cryptoPunksOldBlock);
-    const cryptoPunksOldResult = transform(
-      updateBlockWithTransactions(
-        cryptoPunksOldBlock,
-        cryptoPunksOldAssetResult,
-      ),
-    );
-    const cryptoPunksOldTx = cryptoPunksOldResult.find(
+    const cryptoPunksOldResult = transform(cryptoPunksOldAssetResult);
+    const cryptoPunksOldTx = cryptoPunksOldResult.transactions.find(
       (tx) =>
         tx.hash ===
         '0xff75a6739be926fe7328167011b5e2ac6a8883f55e76af70410520ef7b115901',
@@ -79,13 +64,8 @@ describe('transactionAssetTransfersOldNFTs', () => {
     const cryptoStrikersBlock = loadBlockFixture('ethereum', 15685187);
     const cryptoStrikersAssetResult =
       transactionAssetTransfers(cryptoStrikersBlock);
-    const cryptoStrikersResult = transform(
-      updateBlockWithTransactions(
-        cryptoStrikersBlock,
-        cryptoStrikersAssetResult,
-      ),
-    );
-    const cryptoStrikersTx = cryptoStrikersResult.find(
+    const cryptoStrikersResult = transform(cryptoStrikersAssetResult);
+    const cryptoStrikersTx = cryptoStrikersResult.transactions.find(
       (tx) =>
         tx.hash ===
         '0xff760c32edcba188099fbc66ceb97ccd5917da91da7194e8db8f513c267d8d1a',
@@ -103,13 +83,8 @@ describe('transactionAssetTransfersOldNFTs', () => {
     const cryptoFightersBlock = loadBlockFixture('ethereum', 16751455);
     const cryptoFightersAssetResult =
       transactionAssetTransfers(cryptoFightersBlock);
-    const cryptoFightersResult = transform(
-      updateBlockWithTransactions(
-        cryptoFightersBlock,
-        cryptoFightersAssetResult,
-      ),
-    );
-    const cryptoFightersTx = cryptoFightersResult.find(
+    const cryptoFightersResult = transform(cryptoFightersAssetResult);
+    const cryptoFightersTx = cryptoFightersResult.transactions.find(
       (tx) =>
         tx.hash ===
         '0xd643017d3ae36bbe76bea7c3ed828ac5388a2698cb313957f8d3958e6bff548f',

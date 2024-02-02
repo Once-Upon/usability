@@ -5,7 +5,6 @@ import {
   type EventLogTopics,
   type RawBlock,
   type RawTransaction,
-  type transactionAssetTransfers,
 } from '../../types';
 import {
   KNOWN_ADDRESSES,
@@ -120,20 +119,18 @@ function updateTokenTransfers(tx: RawTransaction) {
   return assetTransfers;
 }
 
-export function transform(block: RawBlock) {
-  const results: transactionAssetTransfers[] = block.transactions.map((tx) => {
-    let assetTransfers = tx.assetTransfers;
+export function transform(block: RawBlock): RawBlock {
+  block.transactions = block.transactions.map((tx) => {
     const hasOldNFTTransfer = tx.assetTransfers?.some(
       (assetTransfer) =>
         assetTransfer.type !== AssetType.ETH &&
         OLD_NFT_ADDRESSES.includes(assetTransfer.asset),
     );
     if (hasOldNFTTransfer) {
-      assetTransfers = updateTokenTransfers(tx);
+      tx.assetTransfers = updateTokenTransfers(tx);
     }
-
-    return { hash: tx.hash, assetTransfers };
+    return tx;
   });
 
-  return results;
+  return block;
 }

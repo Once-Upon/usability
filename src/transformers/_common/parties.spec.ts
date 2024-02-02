@@ -1,4 +1,4 @@
-import { transform } from './transactionParties';
+import { transform } from './parties';
 import { loadBlockFixture } from '../../helpers/utils';
 
 describe('transactionParties', () => {
@@ -6,7 +6,7 @@ describe('transactionParties', () => {
     const block = loadBlockFixture('ethereum', '17686037_decode');
     const result = transform(block);
 
-    const txResult = result.find(
+    const txResult = result.transactions.find(
       (tx) =>
         tx.hash ===
         '0x900b1e7aa62740763448008840ac878886a34907395ae140a4f52e09bf3446cc',
@@ -26,7 +26,7 @@ describe('transactionParties', () => {
     const block1 = loadBlockFixture('ethereum', '6088920_decode');
     const result1 = transform(block1);
 
-    const txResult1 = result1.find(
+    const txResult1 = result1.transactions.find(
       (tx) =>
         tx.hash ===
         '0x3ede752dffb235fe8e45e5c5c3cd2d025acd1a5255b3a8fd63ccf7ed7ed55115',
@@ -40,7 +40,7 @@ describe('transactionParties', () => {
     const block2 = loadBlockFixture('ethereum', '18230275_decode');
     const result2 = transform(block2);
 
-    const txResult2 = result2.find(
+    const txResult2 = result2.transactions.find(
       (tx) =>
         tx.hash ===
         '0xece119678a421a7e4c4af38848ef84634028fce2b17720a565136f13e7881db6',
@@ -59,7 +59,7 @@ describe('transactionParties', () => {
     // Zora Sepolia
     const block3 = loadBlockFixture('zora_sepolia', '479884_decode');
     const result3 = transform(block3);
-    const txResult3 = result3.find(
+    const txResult3 = result3.transactions.find(
       (tx) =>
         tx.hash ===
         '0xd9deb98a359b71243f74939985be840f54c658e23d4d81bc44003088ec28df29',
@@ -81,7 +81,7 @@ describe('transactionParties', () => {
     const block4 = loadBlockFixture('lyra_sepolia', '3967804_decode');
     const result4 = transform(block4);
 
-    const txResult4 = result4.find(
+    const txResult4 = result4.transactions.find(
       (tx) =>
         tx.hash ===
         '0xfa58c800fbdc2f34312a6bed8fc8e5052ce59f26a2258a0930529efbcda21ceb',
