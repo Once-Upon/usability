@@ -24,4 +24,3 @@ export const grabTx = async (txHash: string, prefix: string) => {
   // write to file
   fs.writeFileSync(txFilePath, JSON.stringify(transaction, null, 2));
 };
-
