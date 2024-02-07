@@ -4,8 +4,8 @@ export function transform(block: RawBlock): RawBlock {
   block.transactions = block.transactions.map((tx) => {
     let totalL2FeeWei = BigInt(0);
     if (tx.gasPrice) {
-      const l2GasPrice = BigInt(tx.gasPrice);
-      const l2GasUsed = BigInt(tx.receipt.gasUsed);
+      const l2GasPrice = BigInt(tx.gasPrice ?? 0);
+      const l2GasUsed = BigInt(tx.receipt.gasUsed ?? 0);
 
       const l2Gas = l2GasPrice * l2GasUsed;
 
@@ -14,7 +14,7 @@ export function transform(block: RawBlock): RawBlock {
 
       const l1GasWithoutScalar = l1GasPrice * l1GasUsed;
 
-      const scalar = Number(tx.receipt.l1FeeScalar);
+      const scalar = Number(tx.receipt.l1FeeScalar ?? 0);
       const l1GasWithoutScalarAsNumber = Number(l1GasWithoutScalar);
       const l1GasWithScalar = l1GasWithoutScalarAsNumber * scalar;
 
