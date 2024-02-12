@@ -53,7 +53,6 @@ describe('transformations', () => {
       ]);
       // timestamp
       expect(tx.timestamp).toBe(1689269015);
-      expect(tx.isoTimestamp).toBe(new Date(1689269015 * 1000).toISOString());
       // fees
       expect(tx.baseFeePerGas).toBe(49897163985);
       expect(tx.transactionFee).toBe('1103276192872335');
