@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { AssetType, type RawBlock } from '../../types';
+import { type RawBlock } from '../../types';
 
 export function transform(block: RawBlock): RawBlock {
   block.transactions = block.transactions.map((tx) => {
@@ -92,16 +92,6 @@ export function transform(block: RawBlock): RawBlock {
     }
 
     tx.parties = [...new Set(parties)].filter((party) => party);
-    // remove erc20 addresses
-    tx.parties = tx.parties.filter(
-      (party) =>
-        tx.assetTransfers.find(
-          (transfer) =>
-            'asset' in transfer &&
-            transfer.asset === party &&
-            transfer.type === AssetType.ERC20,
-        ) === undefined,
-    );
 
     return tx;
   });
