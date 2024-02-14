@@ -18,7 +18,6 @@ describe('transactionParties', () => {
         '0xc18360217d8f7ab5e7c516566761ea12ce7f9d72',
         '0x08fb1aa2dbb2ef9cd930485c0ec84eddbea1851f',
         '0x2b888954421b424c5d3d9ce9bb67c9bd47537d12',
-        '0xc18360217d8f7ab5e7c516566761ea12ce7f9d72-1910013010224751428410',
       ]);
     }
 
@@ -33,7 +32,7 @@ describe('transactionParties', () => {
     );
     expect(txResult1).toBeDefined();
     if (txResult1) {
-      expect(txResult1.parties.length).toBe(303);
+      expect(txResult1.parties.length).toBe(302);
     }
 
     //NFT should be in parties

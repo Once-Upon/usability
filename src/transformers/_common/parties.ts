@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { type RawBlock } from '../../types';
+import {
+  AssetType,
+  ERC1155AssetTransfer,
+  ERC721AssetTransfer,
+  type RawBlock,
+} from '../../types';
 
 export function transform(block: RawBlock): RawBlock {
   block.transactions = block.transactions.map((tx) => {
@@ -68,14 +73,17 @@ export function transform(block: RawBlock): RawBlock {
       return result;
     });
     // nfts
-    const nfts = tx.receipt.logs
-      .filter(
-        (log) =>
-          (log.decode?.name === 'Transfer' ||
-            log.decode?.name === 'Approval') &&
-          log.decode?.fragment.inputs[2]?.type === 'uint256',
-      )
-      .map((log) => `${log.address.toLowerCase()}-${log.decode?.args[2]}`);
+    const nftTransfers = tx.assetTransfers?.filter(
+      (transfer) =>
+        transfer.type === AssetType.ERC721 ||
+        transfer.type === AssetType.ERC1155,
+    ) as (ERC1155AssetTransfer | ERC721AssetTransfer)[];
+    const nfts = nftTransfers
+      ? nftTransfers.map(
+          (transfer) => `${transfer.asset.toLowerCase()}-${transfer.tokenId}`,
+        )
+      : [];
+
     // contracts created
     const contractsCreated = tx.contracts?.map((contract) => contract.address);
     parties = [
