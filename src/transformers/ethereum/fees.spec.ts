@@ -32,5 +32,12 @@ describe('transactionFees', () => {
     if (postTx) {
       expect(postTx.transactionFee).toBe('4250851431844025');
     }
+
+    // check totalL2FeeWei
+    const block1 = loadBlockFixture('ethereum', 14573289);
+    const result1 = transform(block1);
+    for (const tx of result1.transactions) {
+      expect(tx.transactionFee).toBeDefined();
+    }
   });
 });

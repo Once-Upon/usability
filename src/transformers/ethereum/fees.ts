@@ -1,4 +1,5 @@
 import type { RawBlock } from '../../types';
+import { parseUnits } from 'viem';
 
 export function transform(block: RawBlock): RawBlock {
   block.transactions = block.transactions.map((tx) => {
@@ -18,7 +19,7 @@ export function transform(block: RawBlock): RawBlock {
       const l1GasWithoutScalarAsNumber = Number(l1GasWithoutScalar);
       const l1GasWithScalar = l1GasWithoutScalarAsNumber * scalar;
 
-      totalL2FeeWei = BigInt(l1GasWithScalar) + l2Gas;
+      totalL2FeeWei = parseUnits(l1GasWithScalar.toString(), 18) + l2Gas;
     }
 
     tx.baseFeePerGas = block.baseFeePerGas;
