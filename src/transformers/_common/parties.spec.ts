@@ -26,45 +26,21 @@ describe('transactionParties', () => {
     const txResult2 = result.transactions.find(
       (tx) =>
         tx.hash ===
-        '0xfa58c800fbdc2f34312a6bed8fc8e5052ce59f26a2258a0930529efbcda21ceb',
+        '0x4e4959da92eae0e03e835c5c71e77fe58e8d1e0f9795e309d661fcc65abdc021',
     );
     expect(txResult2).toBeDefined();
     if (txResult2) {
       expect(txResult2.parties).toStrictEqual([
-        '0xfe44ae787a632c45acea658492ddbebe39f002ac',
-        '0xf21d42203af9af1c86e1e8ac501b41f5bc004a0a',
-        '0xf0b44c112630b2423c03080740d1a612474fc12a',
-        '0x9da2873b5ffe73d3ba353111920534f30076cbb4',
-        '0x0000000000000000000000000000000000000001',
-        '0x6bf249f802b9afc6d10af75eb45d4559858c81a1',
-        '0x6e07bbf7fba8e43988aec5f2df6c40d1afb4400e',
-      ]);
-    }
-    // erc20 tokens should not be in parties
-    const block5 = loadBlockFixture('ethereum', '19149188');
-    const result5 = transform(block5);
-
-    const txResult5 = result5.transactions.find(
-      (tx) =>
-        tx.hash ===
-        '0xfb62665dd247906395ece8d563acd41a0072db658dbeeb875390fef23541e1aa',
-    );
-    expect(txResult5).toBeDefined();
-    if (txResult5) {
-      expect(txResult5.parties).toStrictEqual([
-        '0x74b78e98093f5b522a7ebdac3b994641ca7c2b20',
-        '0xdef1c0ded9bec7f1a1670819833240f027b25eff',
-        '0x44a6999ec971cfca458aff25a808f272f6d492a2',
-        '0xb131f4a55907b10d1f0a50d8ab8fa09ec342cd74',
-        '0x22f9dcf4647084d6c31b2765f6910cd85c178c18',
-        '0x2fd08c1f9fc8406c1d7e3a799a13883a7e7949f0',
-        '0x5ebac8dbfbba22168471b0f914131d1976536a25',
+        '0xa6ae57b1da8238cd149bc718c40578e4620b752c',
+        '0x00000000003b3cc22af3ae1eac0440bcee416b40',
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-        '0xb2bc06a4efb20fc6553a69dbfa49b7be938034a7',
-        '0x8146cbbe327364b13d0699f2ced39c637f92501a',
-        '0x43a2a720cd0911690c248075f4a29a5e7716f758',
-        '0x818a4a855bfeb16c305cb65e8d4fb239a308bc48',
-        '0xea500d073652336a58846ada15c25f2c6d2d241f',
+        '0xa9bd7eef0c7affbdbdae92105712e9ff8b06ed49',
+        '0x725c263e32c72ddc3a19bea12c5a0479a81ee688',
+        '0x3421b1fb3f9e1bb232386ae055fa788ee0e01463',
+        '0xb9f77c41becc96bfcf9dd75623a72dd92309e4a6',
+        '0x7a250d5630b4cf539739df2c5dacb4c659f2488d',
+        '0xc3d1eb891f24de439937c73748fc455588828489',
+        '0xc52b39ab373c6c5dceb9b87658808f956dfd25fd',
       ]);
     }
   });

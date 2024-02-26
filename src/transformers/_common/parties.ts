@@ -73,7 +73,6 @@ export function transform(block: RawBlock): RawBlock {
       return result;
     });
     // nfts
-<<<<<<< HEAD
     const nftTransfers = tx.assetTransfers?.filter(
       (transfer) =>
         transfer.type === AssetType.ERC721 ||
@@ -84,19 +83,6 @@ export function transform(block: RawBlock): RawBlock {
           (transfer) => `${transfer.asset.toLowerCase()}-${transfer.tokenId}`,
         )
       : [];
-=======
-    const nfts = tx.receipt.logs
-      .filter(
-        (log) =>
-          (log.decoded?.name === 'Transfer' ||
-            log.decoded?.name === 'Approval') &&
-          log.decoded?.decoded[2]?.type === 'uint256',
-      )
-      .map(
-        (log) =>
-          `${log.address.toLowerCase()}-${log.decoded?.decoded[2].decoded}`,
-      );
->>>>>>> abd39ae (feat: update parties)
     // contracts created
     const contractsCreated = tx.contracts?.map((contract) => contract.address);
     parties = [
