@@ -44,7 +44,7 @@ export function transform(block: RawBlock): RawBlock {
       // grab event inputs params from decoded trace
       const partiesFromTrace = trace.decoded?.decoded
         .map((param) =>
-          param.type === 'address' && trace.decode
+          param.type === 'address' && trace.decoded
             ? param.decoded.toLowerCase()
             : '',
         )
@@ -61,7 +61,7 @@ export function transform(block: RawBlock): RawBlock {
       // grab event inputs params from decoded log
       const partiesFromLog = log.decoded?.decoded
         .map((param) =>
-          param.type === 'address' && log.decode
+          param.type === 'address' && log.decoded
             ? param.decoded.toLowerCase()
             : '',
         )
