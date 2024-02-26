@@ -1,16 +1,15 @@
-import { StdObj, FragmentType, ParamType } from './shared';
+import { StdObj } from './shared';
 
 export type LogDescription = {
-  fragment: {
-    name: string;
-    type: FragmentType;
-    inputs: ReadonlyArray<ParamType>;
-    anonymous: boolean;
-  };
-  name: string;
   signature: string;
-  args: string[];
-  topic: string;
+  signature_with_arg_names: string;
+  name: string;
+  decoded: Array<{
+    indexed?: boolean;
+    name: string;
+    type: string;
+    decoded: string;
+  }>;
 };
 
 export type RawLog = StdObj & {
@@ -18,7 +17,7 @@ export type RawLog = StdObj & {
   data: string;
   logIndex: number;
   topics: string[];
-  decode?: LogDescription;
+  decoded?: LogDescription;
 };
 
 export type RawReceipt = StdObj & {

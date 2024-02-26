@@ -1,4 +1,4 @@
-import { StdObj, FragmentType, ParamType } from './shared';
+import { StdObj } from './shared';
 import { AssetTransfer, NetAssetTransfers } from './asset';
 import { RawReceipt } from './log';
 import { Contract } from './contract';
@@ -15,7 +15,7 @@ export type RawTransaction = StdObj & {
   to: string;
   traces: RawTrace[];
   contracts?: Contract[];
-  decode?: TransactionDescription;
+  decoded?: TransactionDescription;
   context: TxContext;
   assetTransfers: AssetTransfer[];
   netAssetTransfers: NetAssetTransfers;
@@ -55,25 +55,19 @@ export type RawTrace = StdObj & {
   transactionHash: string;
   transactionPosition: number;
   type: string;
-  decode?: TransactionDescription;
+  decoded?: TransactionDescription;
 };
 
 export type TransactionDescription = {
-  fragment: {
-    name: string;
-    type: FragmentType;
-    inputs: ReadonlyArray<ParamType>;
-    outputs: ReadonlyArray<ParamType>;
-    constant: boolean;
-    stateMutability: 'payable' | 'nonpayable' | 'view' | 'pure';
-    payable: boolean;
-    gas: null | string;
-  };
-  name: string;
-  args: string[];
   signature: string;
-  selector: string;
-  value: string;
+  signature_with_arg_names: string;
+  name: string;
+  decoded: Array<{
+    indexed?: boolean;
+    name: string;
+    type: string;
+    decoded: string;
+  }>;
 };
 
 export type TxContext = {
