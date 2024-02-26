@@ -17,11 +17,11 @@ export function transform(block: RawBlock): RawBlock {
       parties = [...parties, tx.to.toLowerCase()];
     }
     // address from input data
-    const inputAddresses: string[] = tx.decode
-      ? tx.decode.fragment.inputs
-          .map((param, index) =>
+    const inputAddresses: string[] = tx.decoded
+      ? tx.decoded.decoded
+          .map((param) =>
             param.type === 'address' && tx.decode
-              ? tx.decode.args[index].toLowerCase()
+              ? param.decoded.toLowerCase()
               : '',
           )
           .filter((address) => address !== '')
@@ -42,10 +42,10 @@ export function transform(block: RawBlock): RawBlock {
         }
       }
       // grab event inputs params from decoded trace
-      const partiesFromTrace = trace.decode?.fragment.inputs
-        .map((param, index) =>
-          param.type === 'address' && trace.decode
-            ? trace.decode.args[index].toLowerCase()
+      const partiesFromTrace = trace.decoded?.decoded
+        .map((param) =>
+          param.type === 'address' && trace.decoded
+            ? param.decoded.toLowerCase()
             : '',
         )
         .filter((address) => address !== '');
@@ -59,10 +59,10 @@ export function transform(block: RawBlock): RawBlock {
     const logParties = tx.receipt.logs.map((log) => {
       let result = [log.address.toLowerCase()];
       // grab event inputs params from decoded log
-      const partiesFromLog = log.decode?.fragment.inputs
-        .map((param, index) =>
-          param.type === 'address' && log.decode
-            ? log.decode.args[index].toLowerCase()
+      const partiesFromLog = log.decoded?.decoded
+        .map((param) =>
+          param.type === 'address' && log.decoded
+            ? param.decoded.toLowerCase()
             : '',
         )
         .filter((address) => address !== '');
@@ -83,7 +83,6 @@ export function transform(block: RawBlock): RawBlock {
           (transfer) => `${transfer.asset.toLowerCase()}-${transfer.tokenId}`,
         )
       : [];
-
     // contracts created
     const contractsCreated = tx.contracts?.map((contract) => contract.address);
     parties = [
