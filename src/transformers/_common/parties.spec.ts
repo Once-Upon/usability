@@ -63,6 +63,23 @@ describe('transactionParties', () => {
       ]);
     }
 
+    const txResult4 = result1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xe408697db3e84a9287f563dafb8243c0e12ed604cc669a07157d40485d43226b',
+    );
+    expect(txResult4).toBeDefined();
+    if (txResult4) {
+      expect(txResult4.parties).toStrictEqual([
+        '0xf074c1652d4ff936effe0087e7ce57c62aa7371d',
+        '0xd1d2eb1b1e90b638588728b4130137d262c87cae',
+        '0x8d92a6812b3da2346883f0631910c96cb9c5a5f9',
+        '0x2906bdda4bde0338cf9af4370d5b838da4a0d08f',
+        '0x1111111254eeb25477b68fb85ed929f73a960582',
+        '0x54b50187becd0bbcfd52ec5d538433dab044d2a8',
+      ]);
+    }
+
     const block2 = loadBlockFixture('ethereum', '18965012_decoded');
     const result2 = transform(block2);
 

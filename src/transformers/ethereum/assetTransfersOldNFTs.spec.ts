@@ -99,4 +99,31 @@ describe('transactionAssetTransfersOldNFTs', () => {
       }
     }
   });
+
+  it('should return asset transfers for Cryptokitties transactions', () => {
+    const cryptoKittiesBlock = loadBlockFixture('ethereum', '18815007_decoded');
+    const cryptoKittiesAssetResult =
+      transactionAssetTransfers(cryptoKittiesBlock);
+    const cryptoKittiesResult = transform(cryptoKittiesAssetResult);
+    const cryptoKittiesTx = cryptoKittiesResult.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0x76a07f3f822f6235372804b2ffab705a79b89dbe6a15ad086b6879aa97d60321',
+    );
+    expect(cryptoKittiesTx).toBeDefined();
+    if (cryptoKittiesTx) {
+      const cryptoKittiesTransfers = cryptoKittiesTx.assetTransfers;
+      expect(cryptoKittiesTransfers.length).toBe(1);
+      if ('tokenId' in cryptoKittiesTransfers[0]) {
+        expect(cryptoKittiesTransfers[0].tokenId).toBe('2020925');
+        expect(cryptoKittiesTransfers[0].from).toBe(
+          '0xd695429819d9dd942b2485c3dedd141a774fc774',
+        );
+        expect(cryptoKittiesTransfers[0].to).toBe(
+          '0x82f8cb7e198972e2ef89e0c0cc10ffbd878792a6',
+        );
+      }
+      expect(cryptoKittiesTransfers[0].type).toBe('erc721');
+    }
+  });
 });
