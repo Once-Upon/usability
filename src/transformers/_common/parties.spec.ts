@@ -62,5 +62,10 @@ describe('transactionParties', () => {
         '0x54b50187becd0bbcfd52ec5d538433dab044d2a8',
       ]);
     }
+
+    const block2 = loadBlockFixture('ethereum', '18965012_decoded');
+    const result2 = transform(block2);
+
+    expect(result2).toBeDefined();
   });
 });
