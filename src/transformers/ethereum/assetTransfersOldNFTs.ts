@@ -67,8 +67,8 @@ function updateTokenTransfers(tx: RawTransaction) {
         if (logDescriptor) {
           oldNFTsTransfers.push({
             asset: log.address,
-            from: decodeEVMAddress(logDescriptor.args['from']),
-            to: decodeEVMAddress(logDescriptor.args['to']),
+            from: logDescriptor.args['from'].toLowerCase(),
+            to: logDescriptor.args['to'].toLowerCase(),
             tokenId: BigInt(logDescriptor.args['value']).toString(),
             type: AssetType.ERC721,
           });
