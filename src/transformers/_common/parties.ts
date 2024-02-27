@@ -20,9 +20,7 @@ export function transform(block: RawBlock): RawBlock {
     const inputAddresses: string[] = tx.decoded
       ? tx.decoded.decoded
           .map((param) =>
-            param.type === 'address' && tx.decode
-              ? param.decoded.toLowerCase()
-              : '',
+            param.type === 'address' ? param.decoded.toLowerCase() : '',
           )
           .filter((address) => address !== '')
       : [];
@@ -44,9 +42,7 @@ export function transform(block: RawBlock): RawBlock {
       // grab event inputs params from decoded trace
       const partiesFromTrace = trace.decoded?.decoded
         .map((param) =>
-          param.type === 'address' && trace.decoded
-            ? param.decoded.toLowerCase()
-            : '',
+          param.type === 'address' ? param.decoded.toLowerCase() : '',
         )
         .filter((address) => address !== '');
 
@@ -61,9 +57,7 @@ export function transform(block: RawBlock): RawBlock {
       // grab event inputs params from decoded log
       const partiesFromLog = log.decoded?.decoded
         .map((param) =>
-          param.type === 'address' && log.decoded
-            ? param.decoded.toLowerCase()
-            : '',
+          param.type === 'address' ? param.decoded.toLowerCase() : '',
         )
         .filter((address) => address !== '');
 

@@ -43,5 +43,24 @@ describe('transactionParties', () => {
         '0xc52b39ab373c6c5dceb9b87658808f956dfd25fd',
       ]);
     }
+
+    const block1 = loadBlockFixture('ethereum', '19314625_decoded');
+    const result1 = transform(block1);
+
+    const txResult3 = result1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0x3f72cddbe502dd7af1d946d8715c1166b62a19cf113d924375e9623783e3c27f',
+    );
+    expect(txResult3).toBeDefined();
+    if (txResult3) {
+      expect(txResult3.parties).toStrictEqual([
+        '0x9696f59e4d72e237be84ffd425dcad154bf96976',
+        '0xdac17f958d2ee523a2206206994597c13d831ec7',
+        '0x2906bdda4bde0338cf9af4370d5b838da4a0d08f',
+        '0x1111111254eeb25477b68fb85ed929f73a960582',
+        '0x54b50187becd0bbcfd52ec5d538433dab044d2a8',
+      ]);
+    }
   });
 });
