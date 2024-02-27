@@ -101,7 +101,6 @@ describe('transactionAssetTransfersOldNFTs', () => {
   });
 
   it('should return asset transfers for Cryptokitties transactions', () => {
-    // Sorted combo transfers
     const cryptoKittiesBlock = loadBlockFixture('ethereum', '18815007_decoded');
     const cryptoKittiesAssetResult =
       transactionAssetTransfers(cryptoKittiesBlock);
