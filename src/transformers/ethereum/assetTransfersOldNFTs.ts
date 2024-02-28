@@ -21,6 +21,9 @@ const TRANSFER_SIGNATURES = {
   // event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex)
   CRYPTO_PUNKS_ERC721:
     '0x05af636b70da6819000c49f85b21fa82081c632069bb626f30932034099107d8',
+  // event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress)
+  CRYPTO_PUNKS_ERC721_BUY:
+    '0x58e5d5a525e3b40bc15abaa38b5882678db1ee68befd2f60bafe3a7fd06db9e3',
 };
 
 function updateTokenTransfers(tx: RawTransaction) {
@@ -100,6 +103,15 @@ function updateTokenTransfers(tx: RawTransaction) {
           from: decodeEVMAddress(log.topics[1]),
           to: decodeEVMAddress(log.topics[2]),
           tokenId: BigInt(log.data).toString(),
+          type: AssetType.ERC721,
+        });
+        break;
+      case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_BUY:
+        oldNFTsTransfers.push({
+          asset: log.address,
+          from: decodeEVMAddress(log.topics[2]),
+          to: decodeEVMAddress(log.topics[3]),
+          tokenId: BigInt(log.topics[1]).toString(),
           type: AssetType.ERC721,
         });
         break;
