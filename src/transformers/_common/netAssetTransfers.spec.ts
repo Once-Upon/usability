@@ -61,5 +61,39 @@ describe('transactionNetAssetTransfers', () => {
         },
       ]);
     }
+
+    const cryptoKittiesBlock1 = loadBlockFixture(
+      'ethereum',
+      '19313444_decoded',
+    );
+    const cryptoKittiesAssetResult1 =
+      transactionAssetTransfers(cryptoKittiesBlock1);
+    const cryptoKittiesResult1 = transactionAssetTransfersOldNFTs(
+      cryptoKittiesAssetResult1,
+    );
+    const assetResult1 = transform(cryptoKittiesResult1);
+    const cryptoKittiesTx1 = assetResult1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xf3a7cbc426ad7278fb1c2c52ec0c7c0f41eb91a314b8059cb8cbefe0128f2a2e',
+    );
+    expect(cryptoKittiesTx1).toBeDefined();
+    if (cryptoKittiesTx1) {
+      const ckTransfers = cryptoKittiesTx1.netAssetTransfers;
+      expect(Object.keys(ckTransfers).length).toBe(2);
+      expect(
+        ckTransfers['0x74a61f3efe8d3194d96cc734b3b946933feb6a84'].sent.length,
+      ).toBe(0);
+      expect(
+        ckTransfers['0x74a61f3efe8d3194d96cc734b3b946933feb6a84'].received,
+      ).toStrictEqual([
+        {
+          asset: '0x06012c8cf97bead5deae237070f9587f8e7a266d',
+          id: '0x06012c8cf97bead5deae237070f9587f8e7a266d-2023617',
+          tokenId: '2023617',
+          type: 'erc721',
+        },
+      ]);
+    }
   });
 });

@@ -125,6 +125,34 @@ describe('transactionAssetTransfersOldNFTs', () => {
       }
       expect(cryptoKittiesTransfers[0].type).toBe('erc721');
     }
+
+    const cryptoKittiesBlock1 = loadBlockFixture(
+      'ethereum',
+      '19313444_decoded',
+    );
+    const cryptoKittiesAssetResult1 =
+      transactionAssetTransfers(cryptoKittiesBlock1);
+    const cryptoKittiesResult1 = transform(cryptoKittiesAssetResult1);
+    const cryptoKittiesTx1 = cryptoKittiesResult1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xf3a7cbc426ad7278fb1c2c52ec0c7c0f41eb91a314b8059cb8cbefe0128f2a2e',
+    );
+    expect(cryptoKittiesTx1).toBeDefined();
+    if (cryptoKittiesTx1) {
+      const cryptoKittiesTransfers = cryptoKittiesTx1.assetTransfers;
+      expect(cryptoKittiesTransfers.length).toBe(1);
+      if ('tokenId' in cryptoKittiesTransfers[0]) {
+        expect(cryptoKittiesTransfers[0].tokenId).toBe('2023617');
+        expect(cryptoKittiesTransfers[0].from).toBe(
+          '0x0000000000000000000000000000000000000000',
+        );
+        expect(cryptoKittiesTransfers[0].to).toBe(
+          '0x74a61f3efe8d3194d96cc734b3b946933feb6a84',
+        );
+      }
+      expect(cryptoKittiesTransfers[0].type).toBe('erc721');
+    }
   });
 
   it('should return asset transfers for CryptoPunks transactions', () => {
