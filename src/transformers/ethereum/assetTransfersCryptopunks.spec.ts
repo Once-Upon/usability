@@ -129,4 +129,31 @@ describe('transactionAssetTransfersCryptopunks', () => {
       expect(cryptoPunksTransfers[1].type).toBe('erc721');
     }
   });
+
+  it('should return asset transfers for CryptoPunks assign transactions', () => {
+    const cryptoPunksBlock1 = loadBlockFixture('ethereum', '3846659_decoded');
+    const cryptoPunksAssetResult1 =
+      transactionAssetTransfers(cryptoPunksBlock1);
+    const cryptoPunksResult1 = transform(cryptoPunksAssetResult1);
+    const cryptoPunksTx1 = cryptoPunksResult1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xd7eecc44abcea1a4c9dbd7d7749595635f5dcf8d1795beef52ca36356be6201c',
+    );
+    expect(cryptoPunksTx1).toBeDefined();
+    if (cryptoPunksTx1) {
+      const cryptoPunksTransfers = cryptoPunksTx1.assetTransfers;
+      expect(cryptoPunksTransfers.length).toBe(1);
+      if ('tokenId' in cryptoPunksTransfers[0]) {
+        expect(cryptoPunksTransfers[0].tokenId).toBe('5350');
+        expect(cryptoPunksTransfers[0].from).toBe(
+          '0x0000000000000000000000000000000000000000',
+        );
+        expect(cryptoPunksTransfers[0].to).toBe(
+          '0x5b098b00621eda6a96b7a476220661ad265f083f',
+        );
+      }
+      expect(cryptoPunksTransfers[0].type).toBe('erc721');
+    }
+  });
 });
