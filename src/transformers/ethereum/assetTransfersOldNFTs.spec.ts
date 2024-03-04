@@ -125,5 +125,59 @@ describe('transactionAssetTransfersOldNFTs', () => {
       }
       expect(cryptoKittiesTransfers[0].type).toBe('erc721');
     }
+
+    const cryptoKittiesBlock1 = loadBlockFixture(
+      'ethereum',
+      '19313444_decoded',
+    );
+    const cryptoKittiesAssetResult1 =
+      transactionAssetTransfers(cryptoKittiesBlock1);
+    const cryptoKittiesResult1 = transform(cryptoKittiesAssetResult1);
+    const cryptoKittiesTx1 = cryptoKittiesResult1.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xf3a7cbc426ad7278fb1c2c52ec0c7c0f41eb91a314b8059cb8cbefe0128f2a2e',
+    );
+    expect(cryptoKittiesTx1).toBeDefined();
+    if (cryptoKittiesTx1) {
+      const cryptoKittiesTransfers = cryptoKittiesTx1.assetTransfers;
+      expect(cryptoKittiesTransfers.length).toBe(1);
+      if ('tokenId' in cryptoKittiesTransfers[0]) {
+        expect(cryptoKittiesTransfers[0].tokenId).toBe('2023617');
+        expect(cryptoKittiesTransfers[0].from).toBe(
+          '0x0000000000000000000000000000000000000000',
+        );
+        expect(cryptoKittiesTransfers[0].to).toBe(
+          '0x74a61f3efe8d3194d96cc734b3b946933feb6a84',
+        );
+      }
+      expect(cryptoKittiesTransfers[0].type).toBe('erc721');
+    }
+  });
+
+  it('should return asset transfers for CryptoPunks transactions', () => {
+    const cryptoPunksBlock = loadBlockFixture('ethereum', '19321357_decoded');
+    const cryptoPunksAssetResult = transactionAssetTransfers(cryptoPunksBlock);
+    const cryptoPunksResult = transform(cryptoPunksAssetResult);
+    const cryptoPunksTx = cryptoPunksResult.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0x4b581466cca3f2b50a6b97c053dd207feb911c6f858f21331ff829aa97dc6159',
+    );
+    expect(cryptoPunksTx).toBeDefined();
+    if (cryptoPunksTx) {
+      const cryptoPunksTransfers = cryptoPunksTx.assetTransfers;
+      expect(cryptoPunksTransfers.length).toBe(1);
+      if ('tokenId' in cryptoPunksTransfers[0]) {
+        expect(cryptoPunksTransfers[0].tokenId).toBe('7071');
+        expect(cryptoPunksTransfers[0].from).toBe(
+          '0x4e6d2af4931681a024da8feaa4faba2bf8bbdc65',
+        );
+        expect(cryptoPunksTransfers[0].to).toBe(
+          '0x1919db36ca2fa2e15f9000fd9cdc2edcf863e685',
+        );
+      }
+      expect(cryptoPunksTransfers[0].type).toBe('erc721');
+    }
   });
 });
