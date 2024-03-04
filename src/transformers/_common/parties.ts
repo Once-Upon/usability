@@ -80,7 +80,8 @@ export function transform(block: RawBlock): RawBlock {
     ) as (ERC1155AssetTransfer | ERC721AssetTransfer)[];
     const nfts = nftTransfers
       ? nftTransfers.map(
-          (transfer) => `${transfer.asset.toLowerCase()}-${transfer.tokenId}`,
+          (transfer) =>
+            `${transfer.contract.toLowerCase()}-${transfer.tokenId}`,
         )
       : [];
     // contracts created

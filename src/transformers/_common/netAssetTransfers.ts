@@ -29,46 +29,47 @@ export function transform(block: RawBlock): RawBlock {
 
       let asset: Asset | undefined = undefined;
       let assetValue = BigInt(0);
+      let assetId = '';
       switch (assetTransfer.type) {
         case 'erc721':
           asset = {
-            asset: assetTransfer.asset,
-            id: `${assetTransfer.asset}-${assetTransfer.tokenId}`,
+            contract: assetTransfer.contract,
             tokenId: assetTransfer.tokenId,
             type: assetTransfer.type,
           };
           assetValue = BigInt(1);
+          assetId = `${assetTransfer.contract}-${assetTransfer.tokenId}`;
           break;
         case 'erc1155':
           asset = {
-            asset: assetTransfer.asset,
-            id: `${assetTransfer.asset}-${assetTransfer.tokenId}`,
+            contract: assetTransfer.contract,
             tokenId: assetTransfer.tokenId,
             type: assetTransfer.type,
             value: assetTransfer.value,
           };
           assetValue = BigInt(assetTransfer.value);
+          assetId = `${assetTransfer.contract}-${assetTransfer.tokenId}`;
           break;
         case 'erc20':
           asset = {
-            asset: assetTransfer.asset,
-            id: `${assetTransfer.asset}`,
+            contract: assetTransfer.contract,
             type: assetTransfer.type,
             value: assetTransfer.value,
           };
           assetValue = BigInt(assetTransfer.value);
+          assetId = `${assetTransfer.contract}`;
           break;
         case 'eth':
           asset = {
-            id: 'eth',
             type: assetTransfer.type,
             value: assetTransfer.value,
           };
           assetValue = BigInt(assetTransfer.value);
+          assetId = 'eth';
           break;
       }
 
-      if (!asset?.id) {
+      if (!asset || !assetId) {
         continue;
       }
 
@@ -78,18 +79,18 @@ export function transform(block: RawBlock): RawBlock {
       if (!netAssetsByAddress[assetTransfer.to]) {
         netAssetsByAddress[assetTransfer.to] = {};
       }
-      if (!netAssetsByAddress[assetTransfer.from][asset.id]) {
-        netAssetsByAddress[assetTransfer.from][asset.id] = BigInt(0);
+      if (!netAssetsByAddress[assetTransfer.from][assetId]) {
+        netAssetsByAddress[assetTransfer.from][assetId] = BigInt(0);
       }
-      if (!netAssetsByAddress[assetTransfer.to][asset.id]) {
-        netAssetsByAddress[assetTransfer.to][asset.id] = BigInt(0);
+      if (!netAssetsByAddress[assetTransfer.to][assetId]) {
+        netAssetsByAddress[assetTransfer.to][assetId] = BigInt(0);
       }
 
-      assetsById[asset.id] = asset;
-      netAssetsByAddress[assetTransfer.from][asset.id] =
-        netAssetsByAddress[assetTransfer.from][asset.id] - BigInt(assetValue);
-      netAssetsByAddress[assetTransfer.to][asset.id] =
-        netAssetsByAddress[assetTransfer.to][asset.id] + BigInt(assetValue);
+      assetsById[assetId] = asset;
+      netAssetsByAddress[assetTransfer.from][assetId] =
+        netAssetsByAddress[assetTransfer.from][assetId] - BigInt(assetValue);
+      netAssetsByAddress[assetTransfer.to][assetId] =
+        netAssetsByAddress[assetTransfer.to][assetId] + BigInt(assetValue);
     }
 
     const netAssetTransfers: NetAssetTransfers = {};
@@ -105,7 +106,6 @@ export function transform(block: RawBlock): RawBlock {
 
         const type = assetsById[id].type;
         let assetTransferred: Asset = {
-          id: '',
           type: AssetType.ETH,
           value: '',
         };

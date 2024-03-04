@@ -31,7 +31,7 @@ describe('transactionAssetTransfers', () => {
     expect(wethDepositTx).toBeDefined();
     if (wethDepositTx) {
       const wethDepositTransfers = wethDepositTx.assetTransfers.filter(
-        (t) => 'asset' in t && t.asset === KNOWN_ADDRESSES.WETH,
+        (t) => 'contract' in t && t.contract === KNOWN_ADDRESSES.WETH,
       );
       const ethDepositTransfers = wethDepositTx.assetTransfers.filter(
         (t) => t.type === 'eth',
@@ -55,7 +55,7 @@ describe('transactionAssetTransfers', () => {
     expect(wethWithdrawalTx).toBeDefined();
     if (wethWithdrawalTx) {
       const wethWithdrawalTransfers = wethWithdrawalTx.assetTransfers.filter(
-        (t) => 'asset' in t && t.asset === KNOWN_ADDRESSES.WETH,
+        (t) => 'contract' in t && t.contract === KNOWN_ADDRESSES.WETH,
       );
       const ethWithdrawalTransfers = wethWithdrawalTx.assetTransfers.filter(
         (t) => t.type === 'eth',
