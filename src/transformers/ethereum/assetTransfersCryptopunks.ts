@@ -17,7 +17,7 @@ const TRANSFER_SIGNATURES = {
 };
 
 function updateTokenTransfers(tx: RawTransaction) {
-  const oldNFTsTransfers: AssetTransfer[] = [];
+  const cryptopunksTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
     if (!CRYPTO_PUNKS_ADDRESSES.includes(log.address)) {
@@ -28,7 +28,7 @@ function updateTokenTransfers(tx: RawTransaction) {
 
     switch (signature) {
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721:
-        oldNFTsTransfers.push({
+        cryptopunksTransfers.push({
           asset: log.address,
           from: decodeEVMAddress(log.topics[1]),
           to: decodeEVMAddress(log.topics[2]),
@@ -37,7 +37,7 @@ function updateTokenTransfers(tx: RawTransaction) {
         });
         break;
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_BUY:
-        oldNFTsTransfers.push({
+        cryptopunksTransfers.push({
           asset: log.address,
           from: decodeEVMAddress(log.topics[2]),
           to: decodeEVMAddress(log.topics[3]),
@@ -56,19 +56,19 @@ function updateTokenTransfers(tx: RawTransaction) {
       assetTransfer.type !== AssetType.ETH &&
       !CRYPTO_PUNKS_ADDRESSES.includes(assetTransfer.asset),
   );
-  const assetTransfers = [...nonOldAssetTransfers, ...oldNFTsTransfers];
+  const assetTransfers = [...nonOldAssetTransfers, ...cryptopunksTransfers];
 
   return assetTransfers;
 }
 
 export function transform(block: RawBlock): RawBlock {
   block.transactions = block.transactions.map((tx) => {
-    const hasOldNFTTransfer = tx.assetTransfers?.some(
+    const hasCryptopunksTransfer = tx.assetTransfers?.some(
       (assetTransfer) =>
         assetTransfer.type !== AssetType.ETH &&
         CRYPTO_PUNKS_ADDRESSES.includes(assetTransfer.asset),
     );
-    if (hasOldNFTTransfer) {
+    if (hasCryptopunksTransfer) {
       tx.assetTransfers = updateTokenTransfers(tx);
     }
     return tx;
