@@ -14,6 +14,7 @@ import * as transactionForks from './ethereum/forks';
 
 const children = {
   transactionAssetTransfers,
+  transactionAssetTransfersOldNFTs,
   transactionDelegateCalls,
   transactionDerivativesNeighbors,
   transactionErrors,
@@ -21,7 +22,6 @@ const children = {
   transactionParties,
   transactionSigHash,
   transactionTimestamp,
-  transactionAssetTransfersOldNFTs,
   transactionFees,
   transactionForks,
 };
