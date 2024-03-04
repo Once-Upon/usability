@@ -53,7 +53,7 @@ function updateTokenTransfers(tx: RawTransaction) {
         break;
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_ASSIGN:
         cryptopunksTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: KNOWN_ADDRESSES.NULL,
           to: decodeEVMAddress(log.topics[1]),
           tokenId: BigInt(log.data).toString(),
