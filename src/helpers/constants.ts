@@ -403,8 +403,6 @@ export const EXECUTE_TRANSACTION_SIGNATURE =
   'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
 
 export const OLD_NFT_ADDRESSES = [
-  '0x6ba6f2207e343923ba692e5cae646fb0f566db8d', // CRYPTOPUNKS_OLD
-  '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb', // CRYPTOPUNKS_NEW
   '0x06012c8cf97bead5deae237070f9587f8e7a266d', // CryptoKitties
   '0xe897e5953ef250bd49875fe7a48254def92730b9', // FanBits
   '0x73b0ebea28f76be1368d578d13657354330472a9', // XART
@@ -416,6 +414,12 @@ export const OLD_NFT_ADDRESSES = [
   '0x323a3e1693e7a0959f65972f3bf2dfcb93239dfe', // Digital Art Chain
   '0x552d72f86f04098a4eaeda6d7b665ac12f846ad2', // Dark Winds
 ];
+
+export const CRYPTO_PUNKS_ADDRESSES = [
+  '0x6ba6f2207e343923ba692e5cae646fb0f566db8d', // CRYPTOPUNKS_OLD
+  '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb', // CRYPTOPUNKS_NEW
+];
+
 export const ERC721_TRANSFER_EVENT_1 = [
   {
     anonymous: false,
