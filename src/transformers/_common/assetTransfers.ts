@@ -49,7 +49,7 @@ function getTokenTransfers(tx: RawTransaction) {
         // if there's a 4th topic (indexed parameter), then it's an ERC721
         if (log.topics.length === 4) {
           txAssetTransfers.push({
-            asset: log.address,
+            contract: log.address,
             from: decodeEVMAddress(log.topics[1]),
             to: decodeEVMAddress(log.topics[2]),
             tokenId: BigInt(log.topics[3]).toString(),
@@ -57,7 +57,7 @@ function getTokenTransfers(tx: RawTransaction) {
           });
         } else {
           txAssetTransfers.push({
-            asset: log.address,
+            contract: log.address,
             from: decodeEVMAddress(log.topics[1]),
             to: decodeEVMAddress(log.topics[2]),
             value: BigInt(log.data).toString(),
@@ -77,7 +77,7 @@ function getTokenTransfers(tx: RawTransaction) {
         );
 
         txAssetTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: decodeEVMAddress(log.topics[2]),
           to: decodeEVMAddress(log.topics[3]),
           tokenId: tokenId.toString(),
@@ -98,7 +98,7 @@ function getTokenTransfers(tx: RawTransaction) {
 
         for (let tokenIdx = 0; tokenIdx < tokenIds.length; tokenIdx += 1) {
           txAssetTransfers.push({
-            asset: log.address,
+            contract: log.address,
             from: decodeEVMAddress(log.topics[2]),
             to: decodeEVMAddress(log.topics[3]),
             tokenId: tokenIds[tokenIdx].toString(),
@@ -115,7 +115,7 @@ function getTokenTransfers(tx: RawTransaction) {
         }
 
         txAssetTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: KNOWN_ADDRESSES.NULL,
           to: decodeEVMAddress(log.topics[1]),
           value: BigInt(log.data).toString(),
@@ -130,7 +130,7 @@ function getTokenTransfers(tx: RawTransaction) {
         }
 
         txAssetTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: decodeEVMAddress(log.topics[1]),
           to: KNOWN_ADDRESSES.NULL,
           value: BigInt(log.data).toString(),
@@ -161,10 +161,10 @@ export function transform(block: RawBlock): RawBlock {
     const tokenTransfersByContract: Record<string, AssetTransfer[]> = {};
     for (const transfer of tokenTransfers) {
       if (transfer.type !== AssetType.ETH) {
-        if (!tokenTransfersByContract[transfer.asset]) {
-          tokenTransfersByContract[transfer.asset] = [];
+        if (!tokenTransfersByContract[transfer.contract]) {
+          tokenTransfersByContract[transfer.contract] = [];
         }
-        tokenTransfersByContract[transfer.asset].push(transfer);
+        tokenTransfersByContract[transfer.contract].push(transfer);
       }
     }
 

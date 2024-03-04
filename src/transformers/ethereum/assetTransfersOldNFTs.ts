@@ -62,7 +62,7 @@ function updateTokenTransfers(tx: RawTransaction) {
 
         if (logDescriptor) {
           oldNFTsTransfers.push({
-            asset: log.address,
+            contract: log.address,
             from: logDescriptor.args['from'].toLowerCase(),
             to: logDescriptor.args['to'].toLowerCase(),
             tokenId: BigInt(logDescriptor.args['value']).toString(),
@@ -72,7 +72,7 @@ function updateTokenTransfers(tx: RawTransaction) {
           // if there's a 4th topic (indexed parameter), then it's an ERC721
           if (log.topics.length === 4) {
             oldNFTsTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: decodeEVMAddress(log.topics[0]),
               to: decodeEVMAddress(log.topics[1]),
               tokenId: BigInt(log.topics[2]).toString(),
@@ -80,7 +80,7 @@ function updateTokenTransfers(tx: RawTransaction) {
             });
           } else {
             oldNFTsTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: decodeEVMAddress(log.topics[1]),
               to: decodeEVMAddress(log.topics[2]),
               tokenId: BigInt(log.data).toString(),
@@ -99,7 +99,7 @@ function updateTokenTransfers(tx: RawTransaction) {
   const nonOldAssetTransfers = tx.assetTransfers.filter(
     (assetTransfer) =>
       assetTransfer.type !== AssetType.ETH &&
-      !OLD_NFT_ADDRESSES.includes(assetTransfer.asset),
+      !OLD_NFT_ADDRESSES.includes(assetTransfer.contract),
   );
   const assetTransfers = [...nonOldAssetTransfers, ...oldNFTsTransfers];
 
@@ -111,7 +111,7 @@ export function transform(block: RawBlock): RawBlock {
     const hasOldNFTTransfer = tx.assetTransfers?.some(
       (assetTransfer) =>
         assetTransfer.type !== AssetType.ETH &&
-        OLD_NFT_ADDRESSES.includes(assetTransfer.asset),
+        OLD_NFT_ADDRESSES.includes(assetTransfer.contract),
     );
     if (hasOldNFTTransfer) {
       tx.assetTransfers = updateTokenTransfers(tx);

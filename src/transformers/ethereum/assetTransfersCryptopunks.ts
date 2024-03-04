@@ -35,7 +35,7 @@ function updateTokenTransfers(tx: RawTransaction) {
     switch (signature) {
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721:
         cryptopunksTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: decodeEVMAddress(log.topics[1]),
           to: decodeEVMAddress(log.topics[2]),
           tokenId: BigInt(log.data).toString(),
@@ -44,7 +44,7 @@ function updateTokenTransfers(tx: RawTransaction) {
         break;
       case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_BUY:
         cryptopunksTransfers.push({
-          asset: log.address,
+          contract: log.address,
           from: decodeEVMAddress(log.topics[2]),
           to: decodeEVMAddress(log.topics[3]),
           tokenId: BigInt(log.topics[1]).toString(),
@@ -70,7 +70,7 @@ function updateTokenTransfers(tx: RawTransaction) {
     ? tx.assetTransfers.filter(
         (assetTransfer) =>
           assetTransfer.type !== AssetType.ETH &&
-          !CRYPTO_PUNKS_ADDRESSES.includes(assetTransfer.asset),
+          !CRYPTO_PUNKS_ADDRESSES.includes(assetTransfer.contract),
       )
     : [];
   const assetTransfers = [...nonOldAssetTransfers, ...cryptopunksTransfers];

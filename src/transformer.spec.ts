@@ -32,7 +32,6 @@ describe('transformations', () => {
         netAssetTransfers['0x690b9a9e9aa1c9db991c7721a92d351db4fac990'].sent,
       ).toStrictEqual([
         {
-          id: 'eth',
           type: 'eth',
           value: '71596417211722829',
         },
@@ -76,8 +75,7 @@ describe('transformations', () => {
         ckTransfers['0x74a61f3efe8d3194d96cc734b3b946933feb6a84'].received,
       ).toStrictEqual([
         {
-          asset: '0x06012c8cf97bead5deae237070f9587f8e7a266d',
-          id: '0x06012c8cf97bead5deae237070f9587f8e7a266d-2023617',
+          contract: '0x06012c8cf97bead5deae237070f9587f8e7a266d',
           tokenId: '2023617',
           type: 'erc721',
         },
