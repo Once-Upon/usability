@@ -1,4 +1,4 @@
-import { RawBlock } from 'src/types';
+import { AssetTransfer, NetAssetTransfers, RawBlock } from 'src/types';
 import { makeTransform } from '../helpers/utils';
 import * as transactionAssetTransfers from './_common/assetTransfers';
 import * as transactionDelegateCalls from './_common/delegateCalls';
@@ -28,6 +28,11 @@ const children = {
   transactionForks,
 };
 
+const utils = {
+  extractNetAssetTransfers:
+    transactionNetAssetTransfers.extractNetAssetTransfers,
+};
+
 const transformers = Object.fromEntries(
   Object.keys(children).map((key) => [key, children[key].transform]),
 );
@@ -37,9 +42,15 @@ const transform = makeTransform(transformers);
 type UsabilityTransformer = {
   transform: (block: RawBlock) => RawBlock;
   children: Record<string, unknown>;
+  utils: {
+    extractNetAssetTransfers: (
+      assetTransfers: AssetTransfer[],
+    ) => NetAssetTransfers;
+  };
 };
 
 export const transformer: UsabilityTransformer = {
   transform,
   children,
+  utils,
 };
