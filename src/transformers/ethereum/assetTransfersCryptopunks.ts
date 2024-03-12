@@ -69,7 +69,7 @@ function updateTokenTransfers(tx: RawTransaction) {
   const nonOldAssetTransfers = tx.assetTransfers
     ? tx.assetTransfers.filter(
         (assetTransfer) =>
-          assetTransfer.type !== AssetType.ETH &&
+          assetTransfer.type === AssetType.ETH ||
           !CRYPTO_PUNKS_ADDRESSES.includes(assetTransfer.contract),
       )
     : [];
