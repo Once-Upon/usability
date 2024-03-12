@@ -32,7 +32,7 @@ const outputTransaction = {
   ],
   assetTransfers: [
     {
-      "asset": "0x2d660d49473dbbcaf63929d10d0e3501b4533182",
+      "contract": "0x2d660d49473dbbcaf63929d10d0e3501b4533182",
       "from": "0x0000000000000000000000000000000000000000",
       "to": "0x662127bf82b794a26b7ddb6b495f6a5a20b81738",
       "tokenId": "610",
@@ -44,8 +44,7 @@ const outputTransaction = {
     "0x662127bf82b794a26b7ddb6b495f6a5a20b81738": {
       "received": [
         {
-          "asset": "0x2d660d49473dbbcaf63929d10d0e3501b4533182",
-          "id": "0x2d660d49473dbbcaf63929d10d0e3501b4533182-610",
+          "contract": "0x2d660d49473dbbcaf63929d10d0e3501b4533182",
           "tokenId": "610",
           "type": "erc721"
         }
