@@ -98,7 +98,7 @@ function updateTokenTransfers(tx: RawTransaction) {
   // filter old asset transfers from previous asset transfers
   const nonOldAssetTransfers = tx.assetTransfers.filter(
     (assetTransfer) =>
-      assetTransfer.type !== AssetType.ETH &&
+      assetTransfer.type === AssetType.ETH ||
       !OLD_NFT_ADDRESSES.includes(assetTransfer.contract),
   );
   const assetTransfers = [...nonOldAssetTransfers, ...oldNFTsTransfers];

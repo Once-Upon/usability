@@ -401,5 +401,32 @@ describe('transformations', () => {
       }
       expect(cryptoPunksTransfers[0].type).toBe('erc721');
     }
+
+    const cryptopunksEthBlock = loadBlockFixture(
+      'ethereum',
+      '19385111_decoded',
+    );
+    const cryptopunksEthResult = transformer.transform(cryptopunksEthBlock);
+    const cryptopunksEthTx = cryptopunksEthResult.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0xd0d812782633fde73e8e38daf2e07b4a0ffdfaec9fb3d2a72c5cf656175dcbaa',
+    );
+    expect(cryptopunksEthTx).toBeDefined();
+    if (cryptopunksEthTx) {
+      const cryptoPunksTransfers = cryptopunksEthTx.assetTransfers;
+      console.log(cryptoPunksTransfers);
+      expect(cryptoPunksTransfers.length).toBe(2);
+      if ('tokenId' in cryptoPunksTransfers[1]) {
+        expect(cryptoPunksTransfers[1].tokenId).toBe('8515');
+        expect(cryptoPunksTransfers[1].from).toBe(
+          '0x0232d1083e970f0c78f56202b9a666b526fa379f',
+        );
+        expect(cryptoPunksTransfers[1].to).toBe(
+          '0x93b6af9f6fd83cf2a6a22a7ef529ff65f4724f17',
+        );
+      }
+      expect(cryptoPunksTransfers[1].type).toBe('erc721');
+    }
   });
 });
