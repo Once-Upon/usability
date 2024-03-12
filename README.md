@@ -62,7 +62,22 @@ const outputTransaction = {
     // ..
   },
 };
-
 ```
 
+### Tests
+
+```
+npm run test
+```
+
+### Contributing
+
+Please open a PR on this repo and request review from [pcowgill](https://github.com/pcowgill) and [jordanmessina](https://github.com/jordanmessina)
+
+### Other resources
+
 For additional decoration of transaction objects with more context, this library can be used in combination with [@once-upon/evm-context](https://github.com/Once-Upon/context).
+
+## License
+
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
