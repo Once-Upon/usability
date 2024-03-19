@@ -634,6 +634,39 @@ export const ERC721_TRANSFER_EVENT_2 = [
   },
 ] as const;
 
+export const CRYPTO_PUNKS_TRANSFER_EVENTS = [
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'punkIndex', type: 'uint256' },
+    ],
+    name: 'PunkTransfer',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'punkIndex', type: 'uint256' },
+      { indexed: false, name: 'value', type: 'uint256' },
+      { indexed: true, name: 'fromAddress', type: 'address' },
+      { indexed: true, name: 'toAddress', type: 'address' },
+    ],
+    name: 'PunkBought',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'punkIndex', type: 'uint256' },
+    ],
+    name: 'Assign',
+    type: 'event',
+  },
+] as const;
+
 export const PROXY_IMPLEMENTATION_METHOD_SIGNATURES = [
   'implementation()',
   'IMPL()',

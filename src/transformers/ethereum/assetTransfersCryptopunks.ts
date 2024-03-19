@@ -1,6 +1,7 @@
-import { decodeEVMAddress } from '../../helpers/utils';
+import { decodeLog } from '../../helpers/utils';
 import {
   AssetType,
+  EventLogTopics,
   type AssetTransfer,
   type RawBlock,
   type RawTransaction,
@@ -8,19 +9,9 @@ import {
 import {
   CRYPTO_PUNKS_ADDRESSES,
   KNOWN_ADDRESSES,
+  CRYPTO_PUNKS_TRANSFER_EVENTS,
 } from '../../helpers/constants';
-
-const TRANSFER_SIGNATURES = {
-  // event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex)
-  CRYPTO_PUNKS_ERC721:
-    '0x05af636b70da6819000c49f85b21fa82081c632069bb626f30932034099107d8',
-  // event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress)
-  CRYPTO_PUNKS_ERC721_BUY:
-    '0x58e5d5a525e3b40bc15abaa38b5882678db1ee68befd2f60bafe3a7fd06db9e3',
-  // Assign (index_topic_1 address to, uint256 punkIndex)
-  CRYPTO_PUNKS_ERC721_ASSIGN:
-    '0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba',
-};
+import { Hex } from 'viem';
 
 function updateTokenTransfers(tx: RawTransaction) {
   const cryptopunksTransfers: AssetTransfer[] = [];
@@ -30,33 +21,40 @@ function updateTokenTransfers(tx: RawTransaction) {
       continue;
     }
 
-    const [signature] = log.topics;
+    const logDescriptor = decodeLog(
+      CRYPTO_PUNKS_TRANSFER_EVENTS,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (!logDescriptor) {
+      continue;
+    }
 
-    switch (signature) {
-      case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721:
+    switch (logDescriptor.eventName) {
+      case 'PunkTransfer':
         cryptopunksTransfers.push({
           contract: log.address,
-          from: decodeEVMAddress(log.topics[1]),
-          to: decodeEVMAddress(log.topics[2]),
-          tokenId: BigInt(log.data).toString(),
+          from: logDescriptor.args['from'].toLowerCase(),
+          to: logDescriptor.args['to'].toLowerCase(),
+          tokenId: BigInt(logDescriptor.args['punkIndex']).toString(),
           type: AssetType.ERC721,
         });
         break;
-      case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_BUY:
+      case 'PunkBought':
         cryptopunksTransfers.push({
           contract: log.address,
-          from: decodeEVMAddress(log.topics[2]),
-          to: decodeEVMAddress(log.topics[3]),
-          tokenId: BigInt(log.topics[1]).toString(),
+          from: logDescriptor.args['fromAddress'].toLowerCase(),
+          to: logDescriptor.args['toAddress'].toLowerCase(),
+          tokenId: BigInt(logDescriptor.args['punkIndex']).toString(),
           type: AssetType.ERC721,
         });
         break;
-      case TRANSFER_SIGNATURES.CRYPTO_PUNKS_ERC721_ASSIGN:
+      case 'Assign':
         cryptopunksTransfers.push({
           contract: log.address,
           from: KNOWN_ADDRESSES.NULL,
-          to: decodeEVMAddress(log.topics[1]),
-          tokenId: BigInt(log.data).toString(),
+          to: logDescriptor.args['to'].toLowerCase(),
+          tokenId: BigInt(logDescriptor.args['punkIndex']).toString(),
           type: AssetType.ERC721,
         });
         break;
