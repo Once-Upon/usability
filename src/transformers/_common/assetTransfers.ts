@@ -23,8 +23,48 @@ function getTokenTransfers(tx: RawTransaction) {
   const txAssetTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
-    // decode log by erc20 transfer event
     let logDescriptor;
+    // decode log by weth events
+    if (log.address === KNOWN_ADDRESSES.WETH) {
+      logDescriptor = decodeLog(
+        WETH_EVENTS,
+        log.data as Hex,
+        log.topics as EventLogTopics,
+      );
+      if (logDescriptor) {
+        switch (logDescriptor.eventName) {
+          case 'Deposit':
+            txAssetTransfers.push({
+              asset: log.address,
+              from: KNOWN_ADDRESSES.NULL,
+              to: logDescriptor.args['dst'].toLowerCase(),
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
+          case 'Withdrawal':
+            txAssetTransfers.push({
+              asset: log.address,
+              from: logDescriptor.args['src'].toLowerCase(),
+              to: KNOWN_ADDRESSES.NULL,
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
+          case 'Transfer':
+            txAssetTransfers.push({
+              asset: log.address,
+              from: logDescriptor.args['src'].toLowerCase(),
+              to: logDescriptor.args['dst'].toLowerCase(),
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
+        }
+        continue;
+      }
+    }
+    // decode log by erc20 transfer event
     logDescriptor = decodeLog(
       ERC20_TRANSFER_EVENT,
       log.data as Hex,
@@ -63,7 +103,7 @@ function getTokenTransfers(tx: RawTransaction) {
       log.topics as EventLogTopics,
     );
     if (logDescriptor) {
-      switch (logDescriptor.name) {
+      switch (logDescriptor.eventName) {
         case 'TransferSingle':
           txAssetTransfers.push({
             asset: log.address,
@@ -88,43 +128,6 @@ function getTokenTransfers(tx: RawTransaction) {
               type: AssetType.ERC1155,
             });
           }
-          break;
-      }
-      continue;
-    }
-    // decode log by weth events
-    logDescriptor = decodeLog(
-      WETH_EVENTS,
-      log.data as Hex,
-      log.topics as EventLogTopics,
-    );
-    if (logDescriptor) {
-      switch (logDescriptor.name) {
-        case 'Deposit':
-          if (log.address !== KNOWN_ADDRESSES.WETH) {
-            continue;
-          }
-
-          txAssetTransfers.push({
-            asset: log.address,
-            from: KNOWN_ADDRESSES.NULL,
-            to: logDescriptor.args['dst'].toLowerCase(),
-            value: BigInt(logDescriptor.args['wad']).toString(),
-            type: AssetType.ERC20,
-          });
-          break;
-        case 'Withdrawal':
-          if (log.address !== KNOWN_ADDRESSES.WETH) {
-            break;
-          }
-
-          txAssetTransfers.push({
-            asset: log.address,
-            from: logDescriptor.args['src'].toLowerCase(),
-            to: KNOWN_ADDRESSES.NULL,
-            value: BigInt(logDescriptor.args['wad']).toString(),
-            type: AssetType.ERC20,
-          });
           break;
       }
       continue;

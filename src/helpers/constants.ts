@@ -572,6 +572,16 @@ export const WETH_EVENTS = [
     name: 'Withdrawal',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'src', type: 'address' },
+      { indexed: true, name: 'dst', type: 'address' },
+      { indexed: false, name: 'wad', type: 'uint256' },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
 ] as const;
 
 export const ERC721_TRANSFER_EVENT_1 = [
