@@ -12,6 +12,8 @@ import {
   ERC721_TRANSFER_EVENT,
   ERC1155_TRANSFER_EVENT,
   WETH_EVENTS,
+  ERC721_TRANSFER_EVENT_1,
+  ERC721_TRANSFER_EVENT_2,
 } from '../../helpers/constants';
 import { decodeLog } from '../../helpers/utils';
 
@@ -93,6 +95,40 @@ function getTokenTransfers(tx: RawTransaction) {
         to: logDescriptor.args['to'].toLowerCase(),
         tokenId: BigInt(logDescriptor.args['tokenId']).toString(),
         type: AssetType.ERC721,
+      });
+      continue;
+    }
+    // decode log by old nfts transfer event
+    // we detect them as erc20 for now, and will be updated on netAssetTransfersOldNFTs and netAssetTransferCryptopunks
+    logDescriptor = decodeLog(
+      ERC721_TRANSFER_EVENT_1,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        value: BigInt(logDescriptor.args['value']).toString(),
+        type: AssetType.ERC20,
+      });
+      continue;
+    }
+    // decode log by old nfts transfer event
+    // we detect them as erc20 for now, and will be updated on netAssetTransfersOldNFTs and netAssetTransferCryptopunks
+    logDescriptor = decodeLog(
+      ERC721_TRANSFER_EVENT_2,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        value: BigInt(logDescriptor.args['value']).toString(),
+        type: AssetType.ERC20,
       });
       continue;
     }
