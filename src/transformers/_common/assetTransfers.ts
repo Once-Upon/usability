@@ -1,146 +1,172 @@
-import { decodeEVMAddress } from '../../helpers/utils';
+import { Hex } from 'viem';
 import {
   AssetType,
+  EventLogTopics,
   type AssetTransfer,
   type RawBlock,
   type RawTransaction,
 } from '../../types';
-import { KNOWN_ADDRESSES } from '../../helpers/constants';
-import { decodeAbiParameters, Hex } from 'viem';
+import {
+  KNOWN_ADDRESSES,
+  ERC20_TRANSFER_EVENT,
+  ERC721_TRANSFER_EVENT,
+  ERC1155_TRANSFER_EVENT,
+  WETH_EVENTS,
+  ERC721_TRANSFER_EVENT_1,
+  ERC721_TRANSFER_EVENT_2,
+} from '../../helpers/constants';
+import { decodeLog } from '../../helpers/utils';
 
 // 1. pull out token transfers from logs
 // 2. pull out ETH transfers from traces (this covers tx.value transfers)
 // 3. order it all by looking at when contracts where called via traces
 
-const TRANSFER_SIGNATURES = {
-  // event Transfer(address indexed from, address indexed to, uint256 value)
-  ERC20: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-
-  // event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
-  ERC721: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-
-  // event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)
-  ERC1155_SINGLE:
-    '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
-
-  // event TransferBatch(address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] values)
-  ERC1155_BATCH:
-    '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
-
-  // event Deposit(address indexed dst, uint wad)
-  WETH_DEPOSIT_ERC20:
-    '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c',
-
-  // event Withdrawal(address indexed src, uint wad)
-  WETH_WITHDRAW_ERC20:
-    '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
-};
-
 function getTokenTransfers(tx: RawTransaction) {
   const txAssetTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
-    const [signature] = log.topics;
-
-    switch (signature) {
-      // @NOTE: all of these cases are the same function signature
-      case TRANSFER_SIGNATURES.ERC20:
-      case TRANSFER_SIGNATURES.ERC721: {
-        // if there's a 4th topic (indexed parameter), then it's an ERC721
-        if (log.topics.length === 4) {
-          txAssetTransfers.push({
-            contract: log.address,
-            from: decodeEVMAddress(log.topics[1]),
-            to: decodeEVMAddress(log.topics[2]),
-            tokenId: BigInt(log.topics[3]).toString(),
-            type: AssetType.ERC721,
-          });
-        } else {
-          txAssetTransfers.push({
-            contract: log.address,
-            from: decodeEVMAddress(log.topics[1]),
-            to: decodeEVMAddress(log.topics[2]),
-            value: BigInt(log.data).toString(),
-            type: AssetType.ERC20,
-          });
+    let logDescriptor;
+    // decode log by weth events
+    if (log.address === KNOWN_ADDRESSES.WETH) {
+      logDescriptor = decodeLog(
+        WETH_EVENTS,
+        log.data as Hex,
+        log.topics as EventLogTopics,
+      );
+      if (logDescriptor) {
+        switch (logDescriptor.eventName) {
+          case 'Deposit':
+            txAssetTransfers.push({
+              contract: log.address,
+              from: KNOWN_ADDRESSES.NULL,
+              to: logDescriptor.args['dst'].toLowerCase(),
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
+          case 'Withdrawal':
+            txAssetTransfers.push({
+              contract: log.address,
+              from: logDescriptor.args['src'].toLowerCase(),
+              to: KNOWN_ADDRESSES.NULL,
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
+          case 'Transfer':
+            txAssetTransfers.push({
+              contract: log.address,
+              from: logDescriptor.args['src'].toLowerCase(),
+              to: logDescriptor.args['dst'].toLowerCase(),
+              value: BigInt(logDescriptor.args['wad']).toString(),
+              type: AssetType.ERC20,
+            });
+            break;
         }
         continue;
       }
-
-      case TRANSFER_SIGNATURES.ERC1155_SINGLE: {
-        const [tokenId, value] = decodeAbiParameters(
-          [
-            { name: 'tokenId', type: 'uint256' },
-            { name: 'value', type: 'uint256' },
-          ],
-          log.data as Hex,
-        );
-
-        txAssetTransfers.push({
-          contract: log.address,
-          from: decodeEVMAddress(log.topics[2]),
-          to: decodeEVMAddress(log.topics[3]),
-          tokenId: tokenId.toString(),
-          value: value.toString(),
-          type: AssetType.ERC1155,
-        });
-        continue;
-      }
-
-      case TRANSFER_SIGNATURES.ERC1155_BATCH: {
-        const [tokenIds, values] = decodeAbiParameters(
-          [
-            { name: 'tokenIds', type: 'uint256[]' },
-            { name: 'values', type: 'uint256[]' },
-          ],
-          log.data as Hex,
-        );
-
-        for (let tokenIdx = 0; tokenIdx < tokenIds.length; tokenIdx += 1) {
+    }
+    // decode log by erc20 transfer event
+    logDescriptor = decodeLog(
+      ERC20_TRANSFER_EVENT,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        value: BigInt(logDescriptor.args['value']).toString(),
+        type: AssetType.ERC20,
+      });
+      continue;
+    }
+    // decode log by erc721 transfer event
+    logDescriptor = decodeLog(
+      ERC721_TRANSFER_EVENT,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        tokenId: BigInt(logDescriptor.args['tokenId']).toString(),
+        type: AssetType.ERC721,
+      });
+      continue;
+    }
+    // decode log by old nfts transfer event
+    // we detect them as erc20 for now, and will be updated on netAssetTransfersOldNFTs and netAssetTransferCryptopunks
+    logDescriptor = decodeLog(
+      ERC721_TRANSFER_EVENT_1,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        value: BigInt(logDescriptor.args['value']).toString(),
+        type: AssetType.ERC20,
+      });
+      continue;
+    }
+    // decode log by old nfts transfer event
+    // we detect them as erc20 for now, and will be updated on netAssetTransfersOldNFTs and netAssetTransferCryptopunks
+    logDescriptor = decodeLog(
+      ERC721_TRANSFER_EVENT_2,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      txAssetTransfers.push({
+        contract: log.address,
+        from: logDescriptor.args['from'].toLowerCase(),
+        to: logDescriptor.args['to'].toLowerCase(),
+        value: BigInt(logDescriptor.args['value']).toString(),
+        type: AssetType.ERC20,
+      });
+      continue;
+    }
+    // decode log by erc1155 transfer event
+    logDescriptor = decodeLog(
+      ERC1155_TRANSFER_EVENT,
+      log.data as Hex,
+      log.topics as EventLogTopics,
+    );
+    if (logDescriptor) {
+      switch (logDescriptor.eventName) {
+        case 'TransferSingle':
           txAssetTransfers.push({
             contract: log.address,
-            from: decodeEVMAddress(log.topics[2]),
-            to: decodeEVMAddress(log.topics[3]),
-            tokenId: tokenIds[tokenIdx].toString(),
-            value: values[tokenIdx].toString(),
+            from: logDescriptor.args['from'].toLowerCase(),
+            to: logDescriptor.args['to'].toLowerCase(),
+            tokenId: BigInt(logDescriptor.args['id']).toString(),
+            value: BigInt(logDescriptor.args['value']).toString(),
             type: AssetType.ERC1155,
           });
-        }
-        continue;
+          break;
+        case 'TransferBatch':
+          const tokenIds = logDescriptor.args['ids'];
+          const values = logDescriptor.args['values'];
+
+          for (let tokenIdx = 0; tokenIdx < tokenIds.length; tokenIdx += 1) {
+            txAssetTransfers.push({
+              contract: log.address,
+              from: logDescriptor.args['from'].toLowerCase(),
+              to: logDescriptor.args['to'].toLowerCase(),
+              tokenId: BigInt(tokenIds[tokenIdx]).toString(),
+              value: BigInt(values[tokenIdx]).toString(),
+              type: AssetType.ERC1155,
+            });
+          }
+          break;
       }
-
-      case TRANSFER_SIGNATURES.WETH_DEPOSIT_ERC20: {
-        if (log.address !== KNOWN_ADDRESSES.WETH) {
-          continue;
-        }
-
-        txAssetTransfers.push({
-          contract: log.address,
-          from: KNOWN_ADDRESSES.NULL,
-          to: decodeEVMAddress(log.topics[1]),
-          value: BigInt(log.data).toString(),
-          type: AssetType.ERC20,
-        });
-        continue;
-      }
-
-      case TRANSFER_SIGNATURES.WETH_WITHDRAW_ERC20: {
-        if (log.address !== KNOWN_ADDRESSES.WETH) {
-          continue;
-        }
-
-        txAssetTransfers.push({
-          contract: log.address,
-          from: decodeEVMAddress(log.topics[1]),
-          to: KNOWN_ADDRESSES.NULL,
-          value: BigInt(log.data).toString(),
-          type: AssetType.ERC20,
-        });
-        continue;
-      }
-
-      default:
-        break;
+      continue;
     }
   }
 

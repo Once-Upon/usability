@@ -9,7 +9,8 @@ import {
   GOVERNOR_METHODS,
   SAFE_METHODS,
 } from './constants';
-import { RawBlock, StdObj } from '../types';
+import { EventLogTopics, RawBlock, StdObj } from '../types';
+import { Abi, Hex, decodeEventLog } from 'viem';
 
 export const makeTransform = (
   children: Record<string, (block: RawBlock) => RawBlock>,
@@ -185,4 +186,21 @@ export function loadBlockFixture(
   const rawBlock = JSON.parse(raw) as RawBlock;
   const block = normalizeBlock(rawBlock);
   return block;
+}
+
+export function decodeLog<TAbi extends Abi>(
+  abi: TAbi,
+  data: Hex,
+  topics: EventLogTopics,
+) {
+  try {
+    const result = decodeEventLog({
+      abi,
+      data,
+      topics,
+    });
+    return result;
+  } catch (err) {
+    return null;
+  }
 }
