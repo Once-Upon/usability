@@ -35,7 +35,7 @@ function getTokenTransfers(tx: RawTransaction) {
         switch (logDescriptor.eventName) {
           case 'Deposit':
             txAssetTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: KNOWN_ADDRESSES.NULL,
               to: logDescriptor.args['dst'].toLowerCase(),
               value: BigInt(logDescriptor.args['wad']).toString(),
@@ -44,7 +44,7 @@ function getTokenTransfers(tx: RawTransaction) {
             break;
           case 'Withdrawal':
             txAssetTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: logDescriptor.args['src'].toLowerCase(),
               to: KNOWN_ADDRESSES.NULL,
               value: BigInt(logDescriptor.args['wad']).toString(),
@@ -53,7 +53,7 @@ function getTokenTransfers(tx: RawTransaction) {
             break;
           case 'Transfer':
             txAssetTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: logDescriptor.args['src'].toLowerCase(),
               to: logDescriptor.args['dst'].toLowerCase(),
               value: BigInt(logDescriptor.args['wad']).toString(),
@@ -72,7 +72,7 @@ function getTokenTransfers(tx: RawTransaction) {
     );
     if (logDescriptor) {
       txAssetTransfers.push({
-        asset: log.address,
+        contract: log.address,
         from: logDescriptor.args['from'].toLowerCase(),
         to: logDescriptor.args['to'].toLowerCase(),
         value: BigInt(logDescriptor.args['value']).toString(),
@@ -88,7 +88,7 @@ function getTokenTransfers(tx: RawTransaction) {
     );
     if (logDescriptor) {
       txAssetTransfers.push({
-        asset: log.address,
+        contract: log.address,
         from: logDescriptor.args['from'].toLowerCase(),
         to: logDescriptor.args['to'].toLowerCase(),
         tokenId: BigInt(logDescriptor.args['tokenId']).toString(),
@@ -106,7 +106,7 @@ function getTokenTransfers(tx: RawTransaction) {
       switch (logDescriptor.eventName) {
         case 'TransferSingle':
           txAssetTransfers.push({
-            asset: log.address,
+            contract: log.address,
             from: logDescriptor.args['from'].toLowerCase(),
             to: logDescriptor.args['to'].toLowerCase(),
             tokenId: BigInt(logDescriptor.args['id']).toString(),
@@ -120,7 +120,7 @@ function getTokenTransfers(tx: RawTransaction) {
 
           for (let tokenIdx = 0; tokenIdx < tokenIds.length; tokenIdx += 1) {
             txAssetTransfers.push({
-              asset: log.address,
+              contract: log.address,
               from: logDescriptor.args['from'].toLowerCase(),
               to: logDescriptor.args['to'].toLowerCase(),
               tokenId: BigInt(tokenIds[tokenIdx]).toString(),
