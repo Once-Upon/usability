@@ -138,9 +138,9 @@ export function extractNetAssetTransfers(
       }
 
       if (value < BigInt(0)) {
-        netAssetTransfers[address].sent.push(assetTransferred);
+        netAssetTransfers[address].sent.push({ ...assetTransferred });
       } else {
-        netAssetTransfers[address].received.push(assetTransferred);
+        netAssetTransfers[address].received.push({ ...assetTransferred });
       }
     }
   }
