@@ -365,6 +365,74 @@ describe('transformations', () => {
           },
         ]);
       }
+
+      const block1 = loadBlockFixture('ethereum', '18843316_decoded');
+      const result1 = transformer.transform(block1);
+      const tx1 = result1.transactions.find(
+        (tx) =>
+          tx.hash ===
+          '0x6dd87875e6553a9f89bb5f5fb96065f870c16fd961938bd0f47231d0d06ccacd',
+      );
+      expect(tx1).toBeDefined();
+      if (tx1) {
+        const netAssetTransfers = tx1.netAssetTransfers;
+        expect(Object.keys(netAssetTransfers).length).toBe(3);
+
+        expect(
+          netAssetTransfers['0xd1d507b688b518d2b7a4f65007799a5e9d80e974'].sent
+            .length,
+        ).toBe(0);
+        expect(
+          netAssetTransfers['0xd1d507b688b518d2b7a4f65007799a5e9d80e974']
+            .received,
+        ).toStrictEqual([
+          {
+            contract: '0x0000000000a39bb272e79075ade125fd351887ac',
+            type: 'erc20',
+            value: '6600000000000000',
+          },
+        ]);
+
+        expect(
+          netAssetTransfers['0x2d89cc4e013db2908b877c51d39ff63982761c96'].sent,
+        ).toStrictEqual([
+          {
+            contract: '0x23581767a106ae21c074b2276d25e5c3e136a68b',
+            type: 'erc721',
+            tokenId: '2281',
+          },
+        ]);
+        expect(
+          netAssetTransfers['0x2d89cc4e013db2908b877c51d39ff63982761c96']
+            .received,
+        ).toStrictEqual([
+          {
+            contract: '0x0000000000a39bb272e79075ade125fd351887ac',
+            type: 'erc20',
+            value: '1313400000000000000',
+          },
+        ]);
+
+        expect(
+          netAssetTransfers['0x4974a7af396d1908cac650bb923f4bd8dd4047c2']
+            .received,
+        ).toStrictEqual([
+          {
+            contract: '0x23581767a106ae21c074b2276d25e5c3e136a68b',
+            type: 'erc721',
+            tokenId: '2281',
+          },
+        ]);
+        expect(
+          netAssetTransfers['0x4974a7af396d1908cac650bb923f4bd8dd4047c2'].sent,
+        ).toStrictEqual([
+          {
+            contract: '0x0000000000a39bb272e79075ade125fd351887ac',
+            type: 'erc20',
+            value: '1320000000000000000',
+          },
+        ]);
+      }
     });
 
     it('should generate netAssetTransfers for cryptoKitties transactions', () => {
@@ -384,7 +452,7 @@ describe('transformations', () => {
         expect(Object.keys(ckTransfers).length).toBe(3);
         expect(
           ckTransfers['0x82f8cb7e198972e2ef89e0c0cc10ffbd878792a6'].sent,
-        ).toStrictEqual([{ type: 'eth', value: '9750000000000000' }]);
+        ).toStrictEqual([{ type: 'eth', value: '10000000000000000' }]);
         expect(
           ckTransfers['0x82f8cb7e198972e2ef89e0c0cc10ffbd878792a6'].received,
         ).toStrictEqual([
