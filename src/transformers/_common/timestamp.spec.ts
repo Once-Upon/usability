@@ -1,5 +1,7 @@
-import { transform } from './timestamp';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transform } from './timestamp';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transform = makeTransform({ test: _transform });
 
 describe('transactionTimestamp', () => {
   it('should return transaction timestamp', () => {

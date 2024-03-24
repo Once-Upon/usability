@@ -1,9 +1,8 @@
-import { decodeEVMAddress } from '../../helpers/utils';
+import { type TxnTransformer, decodeEVMAddress } from '../../helpers/utils';
 import {
   AssetType,
   type AssetTransfer,
-  type RawBlock,
-  type RawTransaction,
+  type PartialTransaction,
 } from '../../types';
 import {
   CRYPTO_PUNKS_ADDRESSES,
@@ -22,7 +21,7 @@ const TRANSFER_SIGNATURES = {
     '0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba',
 };
 
-function updateTokenTransfers(tx: RawTransaction) {
+function updateTokenTransfers(tx: PartialTransaction) {
   const cryptopunksTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
@@ -78,18 +77,14 @@ function updateTokenTransfers(tx: RawTransaction) {
   return assetTransfers;
 }
 
-export function transform(block: RawBlock): RawBlock {
-  block.transactions = block.transactions.map((tx) => {
-    const logs = tx.receipt.logs;
-    const hasCryptopunksTransfer = logs?.some((log) =>
-      CRYPTO_PUNKS_ADDRESSES.includes(log.address),
-    );
+export const transform: TxnTransformer = (_block, tx) => {
+  const logs = tx.receipt.logs;
+  const hasCryptopunksTransfer = logs?.some((log) =>
+    CRYPTO_PUNKS_ADDRESSES.includes(log.address),
+  );
 
-    if (hasCryptopunksTransfer) {
-      tx.assetTransfers = updateTokenTransfers(tx);
-    }
-    return tx;
-  });
-
-  return block;
-}
+  if (hasCryptopunksTransfer) {
+    tx.assetTransfers = updateTokenTransfers(tx);
+  }
+  return tx;
+};

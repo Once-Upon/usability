@@ -1,6 +1,11 @@
-import { transform as transactionAssetTransfers } from '../_common/assetTransfers';
-import { transform } from './assetTransfersCryptopunks';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transactionAssetTransfers } from '../_common/assetTransfers';
+import { transform as _transform } from './assetTransfersCryptopunks';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transactionAssetTransfers = makeTransform({
+  test: _transactionAssetTransfers,
+});
+const transform = makeTransform({ test: _transform });
 
 describe('transactionAssetTransfersCryptopunks', () => {
   it('should return transaction asset transfers CryptoPunks', () => {

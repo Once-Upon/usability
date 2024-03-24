@@ -1,5 +1,7 @@
-import { transform } from './delegateCalls';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transform } from './delegateCalls';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transform = makeTransform({ test: _transform });
 
 describe('transactionDelegateCalls', () => {
   it('should return delegate calls', () => {

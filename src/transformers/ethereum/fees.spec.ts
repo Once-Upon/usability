@@ -1,5 +1,7 @@
-import { transform } from './fees';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transform } from './fees';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transform = makeTransform({ test: _transform });
 
 describe('transactionFees', () => {
   it('should return transaction fees', () => {

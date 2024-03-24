@@ -1,5 +1,7 @@
-import { transform } from './errors';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transform } from './errors';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transform = makeTransform({ test: _transform });
 
 describe('transactionErrors', () => {
   it('should return transaction errors', () => {

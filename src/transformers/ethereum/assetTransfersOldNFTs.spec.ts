@@ -1,6 +1,11 @@
-import { transform as transactionAssetTransfers } from '../_common/assetTransfers';
-import { transform } from './assetTransfersOldNFTs';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transactionAssetTransfers } from '../_common/assetTransfers';
+import { transform as _transform } from './assetTransfersOldNFTs';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
+
+const transactionAssetTransfers = makeTransform({
+  test: _transactionAssetTransfers,
+});
+const transform = makeTransform({ test: _transform });
 
 describe('transactionAssetTransfersOldNFTs', () => {
   it('should return transaction asset transfers old nfts', () => {

@@ -1,8 +1,16 @@
-import { transform as transactionAssetTransfers } from './assetTransfers';
-import { transform as transactionAssetTransfersOldNFTs } from './../ethereum/assetTransfersOldNFTs';
-import { transform } from './netAssetTransfers';
-import { loadBlockFixture } from '../../helpers/utils';
+import { transform as _transactionAssetTransfers } from './assetTransfers';
+import { transform as _transactionAssetTransfersOldNFTs } from './../ethereum/assetTransfersOldNFTs';
+import { transform as _transform } from './netAssetTransfers';
+import { loadBlockFixture, makeTransform } from '../../helpers/utils';
 import { KNOWN_ADDRESSES } from '../../helpers/constants';
+
+const transactionAssetTransfers = makeTransform({
+  test: _transactionAssetTransfers,
+});
+const transactionAssetTransfersOldNFTs = makeTransform({
+  test: _transactionAssetTransfersOldNFTs,
+});
+const transform = makeTransform({ test: _transform });
 
 describe('transactionNetAssetTransfers', () => {
   it('should return net asset transfers', () => {
