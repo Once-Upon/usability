@@ -29,7 +29,7 @@ const children = {
 };
 
 const transformers = Object.fromEntries(
-  Object.keys(children).map((key) => [key, children[key].transform]),
+  Object.entries(children).map(([key, { transform }]) => [key, transform]),
 );
 
 const transform = makeTransform(transformers);
