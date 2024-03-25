@@ -1,19 +1,21 @@
+import { Hex } from 'viem';
 import { InternalHashType, StdObj } from './shared';
 import { AssetTransfer, NetAssetTransfers } from './asset';
 import { RawLog, RawReceipt } from './log';
 import { Contract } from './contract';
 
-type PartialReceipt = Partial<RawReceipt> & { logs: RawLog[] };
+export type PartialReceipt = Partial<RawReceipt> & { logs: RawLog[] };
 
 export type PartialTransaction = {
-  blockNumber: number;
-  from: string;
-  hash: string;
-  input: string;
-  value: string;
+  blockNumber: Hex;
+  chainId: Hex;
+  from: Hex;
+  hash: Hex;
+  input: Hex;
+  value: Hex;
   receipt: PartialReceipt;
-  gasPrice: string;
-  to: string;
+  gasPrice: Hex;
+  to: Hex;
 
   contracts?: Contract[];
   decoded?: TransactionDescription;
