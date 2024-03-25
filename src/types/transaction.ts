@@ -10,7 +10,6 @@ export type PartialTransaction = {
   blockNumber: Hex;
   chainId: Hex;
   from: Hex;
-  hash: Hex;
   input: Hex;
   value: Hex;
   receipt: PartialReceipt;
@@ -42,6 +41,7 @@ export type RawTransaction = StdObj & PartialTransaction & {
   accessList?: StdObj[];
   receipt: RawReceipt;
   pseudoTransactions?: PseudoTransaction[];
+  hash: Hex;
 };
 
 export type PseudoTransaction = StdObj & PartialTransaction;

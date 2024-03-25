@@ -21,7 +21,7 @@ export type BlockTransformer = (block: RawBlock) => RawBlock;
 export const isRawTransaction = (
   v: PartialTransaction,
 ): v is RawTransaction => {
-  return 'traces' in v;
+  return 'hash' in v;
 };
 
 const isTxnTransformer = (
