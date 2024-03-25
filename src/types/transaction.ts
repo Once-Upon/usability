@@ -1,10 +1,10 @@
 import { Hex } from 'viem';
 import { InternalHashType, StdObj } from './shared';
 import { AssetTransfer, NetAssetTransfers } from './asset';
-import { RawLog, RawReceipt } from './log';
+import { RawReceipt } from './log';
 import { Contract } from './contract';
 
-export type PartialReceipt = Partial<RawReceipt> & { logs: RawLog[] };
+export type PartialReceipt = Partial<RawReceipt> & Pick<RawReceipt, "status" | "logs">;
 
 export type PartialTransaction = {
   blockNumber: Hex;
@@ -14,6 +14,7 @@ export type PartialTransaction = {
   input: Hex;
   value: Hex;
   receipt: PartialReceipt;
+  traces: RawTrace[];
   gasPrice: Hex;
   to: Hex;
 
@@ -31,6 +32,7 @@ export type PartialTransaction = {
   sigHash?: string;
   internalSigHashes?: InternalHashType[];
   timestamp?: number;
+  delegateCalls?: RawTrace[];
 
   baseFeePerGas?: string | number;
   transactionFee?: string;
@@ -40,8 +42,6 @@ export type RawTransaction = StdObj & PartialTransaction & {
   accessList?: StdObj[];
   receipt: RawReceipt;
   pseudoTransactions?: PseudoTransaction[];
-  traces: RawTrace[];
-  delegateCalls?: RawTrace[];
 };
 
 export type PseudoTransaction = StdObj & PartialTransaction;
