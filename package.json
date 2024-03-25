@@ -1,6 +1,6 @@
 {
   "name": "@once-upon/evm-usability",
-  "version": "1.0.0-2",
+  "version": "1.0.0-4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
