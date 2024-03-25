@@ -1,10 +1,9 @@
-import { decodeEVMAddress } from '../../helpers/utils';
+import { type TxnTransformer, decodeEVMAddress } from '../../helpers/utils';
 import {
   AssetType,
   type AssetTransfer,
   type EventLogTopics,
-  type RawBlock,
-  type RawTransaction,
+  type PartialTransaction,
 } from '../../types';
 import {
   KNOWN_ADDRESSES,
@@ -19,7 +18,7 @@ const TRANSFER_SIGNATURES = {
   ERC721: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
 };
 
-function updateTokenTransfers(tx: RawTransaction) {
+function updateTokenTransfers(tx: PartialTransaction) {
   const oldNFTsTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
@@ -106,18 +105,14 @@ function updateTokenTransfers(tx: RawTransaction) {
   return assetTransfers;
 }
 
-export function transform(block: RawBlock): RawBlock {
-  block.transactions = block.transactions.map((tx) => {
-    const hasOldNFTTransfer = tx.assetTransfers?.some(
-      (assetTransfer) =>
-        assetTransfer.type !== AssetType.ETH &&
-        OLD_NFT_ADDRESSES.includes(assetTransfer.asset),
-    );
-    if (hasOldNFTTransfer) {
-      tx.assetTransfers = updateTokenTransfers(tx);
-    }
-    return tx;
-  });
-
-  return block;
-}
+export const transform: TxnTransformer = (_block, tx) => {
+  const hasOldNFTTransfer = tx.assetTransfers?.some(
+    (assetTransfer) =>
+      assetTransfer.type !== AssetType.ETH &&
+      OLD_NFT_ADDRESSES.includes(assetTransfer.asset),
+  );
+  if (hasOldNFTTransfer) {
+    tx.assetTransfers = updateTokenTransfers(tx);
+  }
+  return tx;
+};

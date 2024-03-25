@@ -1,14 +1,15 @@
-import type { RawBlock } from '../../types';
+import {
+  type TxnTransformer,
+  isRawTransaction,
+} from '../../helpers/utils';
 
-export function transform(block: RawBlock): RawBlock {
-  block.transactions = block.transactions.map((tx) => {
-    const delegateCalls = tx.traces.filter(
-      (t) => t.action.callType === 'delegatecall',
-    );
-    tx.delegateCalls = delegateCalls;
+export const transform: TxnTransformer = (_block, tx) => {
+  if (!isRawTransaction(tx)) return tx;
 
-    return tx;
-  });
+  const delegateCalls = tx.traces.filter(
+    (t) => t.action.callType === 'delegatecall',
+  );
+  tx.delegateCalls = delegateCalls;
 
-  return block;
-}
+  return tx;
+};

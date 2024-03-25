@@ -1,19 +1,22 @@
-import { StdObj } from './shared';
+import { Hex } from 'viem';
+import { InternalHashType, StdObj } from './shared';
 import { AssetTransfer, NetAssetTransfers } from './asset';
 import { RawReceipt } from './log';
 import { Contract } from './contract';
 
-export type RawTransaction = StdObj & {
-  accessList?: StdObj[];
-  blockNumber: number;
-  from: string;
-  hash: string;
-  input: string;
-  value: string;
-  receipt: RawReceipt;
-  gasPrice: string;
-  to: string;
+export type PartialReceipt = Partial<RawReceipt> & Pick<RawReceipt, "status" | "logs">;
+
+export type PartialTransaction = {
+  blockNumber: Hex;
+  chainId: Hex;
+  from: Hex;
+  input: Hex;
+  value: Hex;
+  receipt: PartialReceipt;
   traces: RawTrace[];
+  gasPrice: Hex;
+  to: Hex;
+
   contracts?: Contract[];
   decoded?: TransactionDescription;
   context: TxContext;
@@ -21,7 +24,27 @@ export type RawTransaction = StdObj & {
   netAssetTransfers: NetAssetTransfers;
   errors: string[];
   parties: string[];
+
+  // NOTE: inconsistent with Neighbor definition in types/neighbor
+  neighbor?: { address: string; neighbor: string };
+
+  sigHash?: string;
+  internalSigHashes?: InternalHashType[];
+  timestamp?: number;
+  delegateCalls?: RawTrace[];
+
+  baseFeePerGas?: string | number;
+  transactionFee?: string;
 };
+
+export type RawTransaction = StdObj & PartialTransaction & {
+  accessList?: StdObj[];
+  receipt: RawReceipt;
+  pseudoTransactions?: PseudoTransaction[];
+  hash: Hex;
+};
+
+export type PseudoTransaction = StdObj & PartialTransaction;
 
 export type RawTraceAction = StdObj & {
   address: string;

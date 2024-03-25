@@ -1,9 +1,13 @@
-import { decodeEVMAddress } from '../../helpers/utils';
+import {
+  type TxnTransformer,
+  decodeEVMAddress,
+  isRawTransaction,
+} from '../../helpers/utils';
 import {
   AssetType,
   type AssetTransfer,
   type RawBlock,
-  type RawTransaction,
+  type PartialTransaction,
 } from '../../types';
 import { KNOWN_ADDRESSES } from '../../helpers/constants';
 import { decodeAbiParameters, Hex } from 'viem';
@@ -36,7 +40,7 @@ const TRANSFER_SIGNATURES = {
     '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
 };
 
-function getTokenTransfers(tx: RawTransaction) {
+function getTokenTransfers(tx: PartialTransaction) {
   const txAssetTransfers: AssetTransfer[] = [];
 
   for (const log of tx.receipt.logs) {
@@ -147,31 +151,31 @@ function getTokenTransfers(tx: RawTransaction) {
   return txAssetTransfers;
 }
 
-export function transform(block: RawBlock): RawBlock {
-  block.transactions = block.transactions.map((tx) => {
-    // don't count transfers for failed txs
-    if (!tx.receipt.status) {
-      return tx;
-    }
+export const transform: TxnTransformer = (_block, tx) => {
+  // don't count transfers for failed txs
+  if (!tx.receipt.status) {
+    return tx;
+  }
 
-    // first get all of the token transfers from transaction logs
-    const tokenTransfers = getTokenTransfers(tx);
+  // first get all of the token transfers from transaction logs
+  const tokenTransfers = getTokenTransfers(tx);
 
-    // then group by contract
-    const tokenTransfersByContract: Record<string, AssetTransfer[]> = {};
-    for (const transfer of tokenTransfers) {
-      if (transfer.type !== AssetType.ETH) {
-        if (!tokenTransfersByContract[transfer.asset]) {
-          tokenTransfersByContract[transfer.asset] = [];
-        }
-        tokenTransfersByContract[transfer.asset].push(transfer);
+  // then group by contract
+  const tokenTransfersByContract: Record<string, AssetTransfer[]> = {};
+  for (const transfer of tokenTransfers) {
+    if (transfer.type !== AssetType.ETH) {
+      if (!tokenTransfersByContract[transfer.asset]) {
+        tokenTransfersByContract[transfer.asset] = [];
       }
+      tokenTransfersByContract[transfer.asset].push(transfer);
     }
+  }
 
-    // now prepare a final set of *all* asset transfers (including ETH)
-    const assetTransfers: AssetTransfer[] = [];
+  // now prepare a final set of *all* asset transfers (including ETH)
+  const assetTransfers: AssetTransfer[] = [];
 
-    // iterate through the traces
+  // iterate through the traces
+  if (isRawTransaction(tx)) {
     for (const trace of tx.traces) {
       // check for ETH transfers
       if (trace.action.callType !== 'delegatecall') {
@@ -212,22 +216,20 @@ export function transform(block: RawBlock): RawBlock {
         delete tokenTransfersByContract[trace.action.to];
       }
     }
+  }
 
-    if (tokenTransfersByContract[tx.to]?.length > 0) {
-      assetTransfers.push(...tokenTransfersByContract[tx.to]);
-      delete tokenTransfersByContract[tx.to];
-    }
+  if (tokenTransfersByContract[tx.to]?.length > 0) {
+    assetTransfers.push(...tokenTransfersByContract[tx.to]);
+    delete tokenTransfersByContract[tx.to];
+  }
 
-    for (const leftOverTxfers of Object.values(tokenTransfersByContract)) {
-      assetTransfers.push(...leftOverTxfers);
-    }
+  for (const leftOverTxfers of Object.values(tokenTransfersByContract)) {
+    assetTransfers.push(...leftOverTxfers);
+  }
 
-    if (assetTransfers.length > 0) {
-      tx.assetTransfers = assetTransfers;
-    }
+  if (assetTransfers.length > 0) {
+    tx.assetTransfers = assetTransfers;
+  }
 
-    return tx;
-  });
-
-  return block;
-}
+  return tx;
+};

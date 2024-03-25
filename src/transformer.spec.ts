@@ -1,5 +1,6 @@
 import { loadBlockFixture } from './helpers/utils';
 import { transformer } from './transformers';
+import { ENTRY_POINT } from './transformers/_common/accountAbstraction/constants';
 
 describe('transformations', () => {
   it('should transform block', () => {
@@ -83,5 +84,70 @@ describe('transformations', () => {
         },
       ]);
     }
+  });
+
+  it('should unpack and transform pseudoTransactions', () => {
+    const block = loadBlockFixture('ethereum', 19_298_068);
+    const result = transformer.transform(block);
+
+    const txn = result.transactions.find(
+      (tx) =>
+        tx.hash ===
+        '0x7a5e7d32380ae2ca3064b7fbc41e0d698cb7826f61a941737902f4a74a979ca7',
+    );
+    expect(txn).toBeDefined();
+
+    // 4337 transactions should include an eth transfer from entry point to benficiary
+    const beneficiary = '0x12a39672ae8ae8e87e12a5de53c34690d830365c';
+
+    expect(txn).toMatchObject({
+      assetTransfers: expect.arrayContaining([
+        expect.objectContaining({
+          type: 'eth',
+          from: ENTRY_POINT,
+          to: beneficiary,
+        }),
+      ]),
+    });
+
+    expect(txn?.pseudoTransactions).toBeDefined();
+    expect(txn?.pseudoTransactions?.length).toBe(1);
+
+    // pseudo transaction should NOT include eth transfer from entry point to beneficiary
+    const pseudoTransaction = txn!.pseudoTransactions![0];
+    expect(pseudoTransaction).toMatchObject({
+      from: '0x2991c3845396c9f1d262b2ca0674111a59e2c90a',
+      to: '0x5d72015cc621025c265fabffc2fa55ac4821d79f',
+      input: '0x',
+      value: '5000000000000000',
+      assetTransfers: [
+        expect.objectContaining({
+          type: 'eth',
+          from: '0x2991c3845396c9f1d262b2ca0674111a59e2c90a',
+          to: '0x5d72015cc621025c265fabffc2fa55ac4821d79f',
+          value: '5000000000000000',
+        }),
+      ],
+      netAssetTransfers: {
+        '0x2991c3845396c9f1d262b2ca0674111a59e2c90a': expect.objectContaining({
+          sent: [
+            expect.objectContaining({
+              type: 'eth',
+              value: '5000000000000000',
+            }),
+          ],
+          received: [],
+        }),
+        '0x5d72015cc621025c265fabffc2fa55ac4821d79f': expect.objectContaining({
+          sent: [],
+          received: [
+            expect.objectContaining({
+              type: 'eth',
+              value: '5000000000000000',
+            }),
+          ],
+        }),
+      },
+    });
   });
 });
